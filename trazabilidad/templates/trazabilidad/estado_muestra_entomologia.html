@@ -1,0 +1,51 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+    <h4>RESPONSABLE DE RECOLECCIÓN</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>NOMBRES</th>
+            <td>{{ muestra_entomologia.responsable_recoleccion.nombres|upper }}</td>
+        </tr>
+        <tr>
+            <th>APELLIDOS</th>
+            <td>{{ muestra_entomologia.responsable_recoleccion.apellidos|upper }}</td>
+        </tr>
+    </table>
+
+    <h4>LUGAR DE RECOLECCIÓN</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>DEPARTAMENTO</th>
+            <td>{{ muestra_entomologia.lugar_recoleccion.municipio.departamento|upper }}</td>
+        </tr>
+        <tr>
+            <th>MUNICIPIO</th>
+            <td>{{ muestra_entomologia.lugar_recoleccion.municipio|upper }}</td>
+        </tr>
+        <tr>
+            <th>NOMBRE</th>
+            <td>{{ muestra_entomologia.lugar_recoleccion.nombre|upper }}</td>
+        </tr>
+    </table>
+
+    <h4>DATOS DE LA MUESTRA</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>TIPO DE VIGILANCIA</th>
+            <td>{{ muestra_entomologia.tipo_vigilancia.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>ESTADO DE DESARROLLO</th>
+            <td>{{ muestra_entomologia.get_estado_desarrollo_display|upper }}</td>
+        </tr>
+        <tr>
+            <th>TIPO DE MUESTRA</th>
+            <td>{{ muestra_entomologia.tipo_muestra.nombre|upper }}</td>
+        </tr>
+    </table>
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'trazabilidad:estado_muestra_entomologia' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'trazabilidad:actualizar_muestra_entomologia' ingreso.id %}{% endblock %}

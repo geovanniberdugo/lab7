@@ -1,0 +1,39 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+{% include 'covid19/_datos_paciente.html' with muestra=muestra %}
+{% include 'covid19/_entidad_solicitante_covid.html' with muestra=muestra %}
+
+<h4>Información de la Muestra</h4>
+{% for m in ingreso.muestras.all %}
+<table class="table table-bordered">
+    <h5>Muestra #{{forloop.counter}}</h5>
+    <tr>
+        <th>Tipo de muestra</th>
+        <td>{{ m.tipo_muestra|upper }}</td>
+    </tr>
+    <tr>
+        <th>Area</th>
+        <td>{{ ingreso.areas.first|upper }}</td>
+    </tr>
+    <tr>
+        <th>Pruebas Solicitadas</th>
+        <td>
+            {% for prueba in m.pruebas.all.distinct %}
+            {{ prueba.nombre|upper }}
+            {% if not forloop.last %}
+            -
+            {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+{% endfor %}

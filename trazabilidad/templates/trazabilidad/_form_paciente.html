@@ -1,0 +1,96 @@
+<div class="panel panel-primary">
+
+    <div class="panel-heading">
+        <i class="fa fa-user"></i> Identificacion de la Muestra
+    </div>
+    <!-- /.panel-heading -->
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="chekbox">
+                            {{ form_paciente.sin_identificacion }}
+                            Sin Identificación
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_paciente.identificacion.css_classes }}">
+                            <label class="control-label" for="id_identificacion">Identificación:</label>
+                            {{ form_paciente.identificacion }}
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p id="p-tipo-id" class="{{ form_paciente.tipo_identificacion.css_classes }}">
+                            <label class="control-label" for="id_tipo_identificacion">Tipo Identificación:</label>
+                            {{ form_paciente.tipo_identificacion }}
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="{{ form_paciente.edad.css_classes }}">
+                            <label class="control-label" for="id_edad">Edad:</label>
+                            {{ form_paciente.edad }}
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="{{ form_paciente.tipo_edad.css_classes }}">
+                            <label class="control-label" for="id_tipo_edad">Tipo Edad:</label>
+                            {{ form_paciente.tipo_edad }}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="{{ form_paciente.nombre.css_classes }}">
+                            <label class="control-label" for="id_nombre">Nombres:</label>
+                            {{ form_paciente.nombre }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="{{ form_paciente.apellido.css_classes }}">
+                            <label class="control-label" for="id_apellido">Apellidos:</label>
+                            {{ form_paciente.apellido }}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="{{ form_paciente.sexo.css_classes }}">
+                            <label class="control-label" for="id_sexo">Sexo:</label>
+                            {{ form_paciente.sexo }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="{{ form_paciente.direccion.css_classes }}">
+                            <label class="control-label" for="id_direccion">Dirección:</label>
+                            {{ form_paciente.direccion }}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="{{ form_paciente.eps.css_classes }}">
+                            <label class="control-label" for="id_eps">Eps:</label>
+                            {{ form_paciente.eps }}
+                        </p>
+                    </div>
+                    {% if clinicac %}
+                    <div id="embarazada" class="col-md-6 hidden">
+                        <p class="{{ form_muestra.embarazada.css_classes }}">
+                            <label class="control-label" for="id_embarazada">Embarazada:</label>
+                            {{ form_muestra.embarazada }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-success usuario" style="display:none" id="usuario_nuevo">
+                    USUARIO NUEVO
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

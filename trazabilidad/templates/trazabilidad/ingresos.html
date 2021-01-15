@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitudes recepcionadas{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'datatables/datatables.min.css' %}" />
+{% endblock %}
+
+{% block heading %}Solicitudes de Procesamiento Recepcionadas{% endblock %}
+
+{% block content %}
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tabparcial" data-toggle="tab" role="tab">Ingreso Parcial</a>
+        </li>
+        <li>
+            <a href="#tabcurso" data-toggle="tab" role="tab">En Curso</a>
+        </li>
+        <li>
+            <a href="#tabrechazorecepcion" data-toggle="tab" role="tab">Rechazadas por Recepción</a>
+        </li>
+        <li>
+            <a href="#tabrechazoanalista" data-toggle="tab" role="tab">Rechazadas por Analista</a>
+        </li>
+        <li>
+            <a href="#tabresultado" data-toggle="tab" role="tab">Resultado Emitido</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id="tabparcial">
+            <br>
+            <div class="table-responsive">
+                <table id="parciales" class="table table-striped table-bordered table-hover" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Radicado</th>
+                            <th>Fecha de recepción</th>
+                            <th>Estado</th>
+                            <th>Tipo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="tabcurso">
+            <br>
+            <div class="table-responsive">
+                <table id="encurso" class="table table-striped table-bordered table-hover" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Radicado</th>
+                            <th>Fecha de recepción</th>
+                            <th>Estado</th>
+                            <th>Tipo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="tabrechazorecepcion">
+            <br>
+            <div class="table-responsive">
+                <table id="rechazadosrecepcion" class="table table-striped table-bordered table-hover" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Radicado</th>
+                            <th>Fecha de recepción</th>
+                            <th>Parcial/Confirmado</th>
+                            <th>Tipo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="tabrechazoanalista">
+            <br>
+            <div class="table-responsive">
+                <table id="rechazadosanalista" class="table table-striped table-bordered table-hover" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Radicado</th>
+                            <th>Fecha de recepción</th>
+                            <th>Tipo</th>
+                            <th>Acción</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="tabresultado">
+            <br>
+            <div class="table-responsive">
+                <table id="resultados" class="table table-striped table-bordered table-hover" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Radicado</th>
+                            <th>Fecha de recepción</th>
+                            <th>Tipo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="div-modal-comment"></div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'datatables/datatables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/datatable.es.js' %}"></script>
+    <script type="text/javascript">
+    (function () {
+        const basicConfig = {
+            rowId: 'id',
+            ordering: false,
+            searching: true,
+            processing: true,
+            serverSide: true,
+            lengthChange: false,
+            language: {
+                ...datatableEs,
+                sSearch: 'Buscar radicado',
+            },
+        };
+
+        const parcialesTable = $('#parciales').DataTable({
+            ...basicConfig,
+
+            ajax: '{% url "trazabilidad:ingresos-recepcionados-parciales-api" %}',
+            columns: [
+                { data: 'radicado' },
+                { data: 'fecha_recepcion' },
+                { data: 'estado_display' },
+                { data: 'programa.nombre' },
+                {
+                    data: 'id',
+                    render: function (data, type, row, meta) {
+                        return `
+                            <a class="btn btn-primary btn-xs" href="${row.url_editar_ingreso}">
+                                <i class="glyphicon glyphicon glyphicon-pencil"></i>
+                            </a>
+                            ${row.estado === 'A'
+                                ?  `<a class="btn btn-primary btn-xs" href="${row.url_estado_ingreso}">
+                                        <i class="glyphicon glyphicon glyphicon-remove"></i>
+                                    </a>`
+                                : ''
+                            }
+                            <a class="btn btn-primary btn-xs" href="${row.url_radicado_ingreso}">
+                                <i class="fa fa-flask"></i>
+                            </a>
+                        `;
+                    },
+                },
+            ],
+        });
+        
+        const encursoTable = $('#encurso').DataTable({
+            ...basicConfig,
+
+            ajax: '{% url "trazabilidad:ingresos-recepcionados-en-curso-api" %}',
+            columns: [
+                { data: 'radicado' },
+                { data: 'fecha_recepcion' },
+                { data: 'estado_display' },
+                { data: 'programa.nombre' },
+                {
+                    data: 'id',
+                    render: function (data, type, row, meta) {
+                        const codigosUrl = '{% url "trazabilidad:codigos_muestras_ingreso" 0 %}'.replace(0, data);
+
+                        return `
+                            <a class="btn btn-primary btn-xs" href="${codigosUrl}">
+                                <i class="fa fa-barcode"></i>
+                            </a>
+                            ${row.estado !== 'A'
+                                ? `<a class="btn btn-primary btn-xs" href="${row.url_estado_ingreso}" title="Agregar Estado">
+                                        <i class="fa fa-recycle"></i>
+                                    </a>`
+                                : ''
+                            }
+                            <a class="btn btn-primary btn-xs" href="${row.url_radicado_ingreso}">
+                                <i class="fa fa-flask"></i>
+                            </a>
+                        `;
+                    },
+                },
+            ],
+        });
+        
+        const rechazadosRecepcionTable = $('#rechazadosrecepcion').DataTable({
+            ...basicConfig,
+
+            ajax: '{% url "trazabilidad:ingresos-recepcionados-rechazados-recepcion-api" %}',
+            columns: [
+                { data: 'radicado' },
+                { data: 'fecha_recepcion' },
+                { 
+                    data: 'confirmada',
+                    render: function (data, type, row, meta) {
+                        return !data ? 'Parcial': 'Confirmado';
+                    },
+                },
+                { data: 'programa.nombre' },
+                {
+                    data: 'id',
+                    render: function (data, type, row, meta) {
+                        return `
+                            ${!row.confirmada
+                                ? `<a class="btn btn-primary btn-xs" href="${row.url_editar_ingreso}">
+                                        <i class="glyphicon glyphicon glyphicon-pencil"></i>
+                                    </a>`
+                                : ''
+                            }
+                            <a class="btn btn-primary btn-xs" href="${row.url_radicado_ingreso}">
+                                <i class="fa fa-flask"></i>
+                            </a>
+                        `;
+                    },
+                },
+            ],
+        });
+        
+        const rechazadosAnalistaTable = $('#rechazadosanalista').DataTable({
+            ...basicConfig,
+
+            ajax: '{% url "trazabilidad:ingresos-recepcionados-rechazados-analista-api" %}',
+            columns: [
+                { data: 'radicado' },
+                { data: 'fecha_recepcion' },
+                { data: 'programa.nombre' },
+                { data: 'comentario' },
+                {
+                    data: 'id',
+                    render: function (data, type, row, meta) {
+                        if (!!row.comentario) return '';
+
+                        return `
+                            <button data-ingreso="${data}" data-toggle="modal" data-backdrop="static" data-target="#modal-comment" class="btn btn-primary btn-xs modal-comentario" title="comentar">
+                                <i class="glyphicon glyphicon glyphicon-pencil"></i>
+                            </button>
+                        `;
+                    },
+                },
+            ],
+        });
+
+        $('#rechazadosanalista tbody').on('click', 'button.modal-comentario', function () {
+            const ingresoId = this.dataset.ingreso;
+            const url = '{% url "trazabilidad:comentario_recepcionista" 0 %}'.replace(0, ingresoId);
+            $('#div-modal-comment').load(url, function (response, status, xhr) {
+                $(`#modal-comment-${ingresoId}`).modal();
+            });
+        });
+
+        $('#div-modal-comment').on('click', 'button[name="comentar"]', function (e) {
+            e.preventDefault();
+            this.classList.add('disabled');
+            this.innerHTML = 'Comentando.....';
+
+            fetch(this.form.action, { method: 'POST', body: new FormData(this.form) })
+                .then(res => res.text())
+                .then(data => {
+                    try {
+                        const { ok, ingreso } = JSON.parse(data);
+                        $(`#modal-comment-${ingreso}`).modal('hide');
+                        rechazadosAnalistaTable.ajax.reload(() => {}, false);
+                    } catch {
+                        const modalDiv = this.closest('#div-modal-comment')
+                        $(modalDiv.querySelector('.modal')).modal('hide');
+                        modalDiv.innerHTML = data;
+                        $(modalDiv.querySelector('.modal')).modal('show');
+
+                        this.classList.remove('disabled');
+                        this.innerHTML = 'Comentar';
+                    }
+                });
+        });
+
+        const resultadosTable = $('#resultados').DataTable({
+            ...basicConfig,
+
+            ajax: '{% url "trazabilidad:ingresos-recepcionados-resultados-api" %}',
+            columns: [
+                { data: 'radicado' },
+                { data: 'fecha_recepcion' },
+                { data: 'programa.nombre' },
+                {
+                    data: 'id',
+                    render: function (data, type, row, meta) {
+                        const url = '{% url "trazabilidad:informe_documento" 0 %}'.replace(0, data);
+
+                        return `
+                            <a class="btn btn-primary btn-xs" href="${url}">
+                                <i class="glyphicon glyphicon-print"></i>
+                            </a>
+                        `;
+                    },
+                },
+            ],
+        });
+    })();
+    </script>
+{% endblock %}

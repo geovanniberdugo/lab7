@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block heading %}Pruebas{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+{% endblock css %}
+
+{% block content %}
+    <div class="panel panel-primary">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        {% crispy form %}
+    </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+	<script type="text/javascript" src="{% static 'js/funciones_apoyo.js' %}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+	<script>
+	jQuery(document).ready(function($) {
+		$('#id_resultados').select2("destroy");
+
+		$('#id_resultados').selectpicker({
+			liveSearch:true,
+		});
+
+        {% if not form.instance.area.programa.codigo == "alimentos" and not form.instance.area.programa.codigo == "aguas" and not form.instance.area.programa.codigo == "bebidas_alcoholicas" %}
+        $('#div_id_valores_referencia').addClass('hidden');
+        {% endif %}
+
+		// var url = "/areas/0/programas"
+        var _programas = ['Alimento', 'Alimentos', 'Agua', 'Aguas', 'bebidas alcoholicas', 'bebidas alcohólicas', 'bebidas_alcoholicas'];
+
+        for (var x = 0; x < 4; x++) {
+            lower = _programas[x].toLowerCase();
+            upper = _programas[x].toUpperCase();
+            if (!(lower in _programas)) {
+                _programas.push(lower);
+            }
+            if (!(upper in _programas)) {
+                _programas.push(upper);
+            }
+        }
+
+		$('#id_programa').change(function(){
+            var id = $(this).val();
+            var programa = $('select[name="programa"]').find('option[value="' + id.toString() + '"]').html();
+            if(id == "") {
+                llenar_select('#id_area', []);
+            }
+            else {
+                $.getJSON("{% url 'trazabilidad:lista_areas_programas_json' 0 %}".replace(0, id), function(response){
+                    {% comment %}console7.log(response);{% endcomment %}
+                    llenar_select('#id_area', response);
+                });
+            }
+
+            if (_programas.indexOf(programa.toLowerCase()) != -1) {
+                if ($('#div_id_valores_referencia').hasClass('hidden')) {
+                    $('#div_id_valores_referencia').removeClass('hidden');
+                }
+            } else {
+                if (!$('#div_id_valores_referencia').hasClass('hidden')) {
+                    $('#div_id_valores_referencia').addClass('hidden');
+                }
+            }
+        });
+	});
+	</script>
+{% endblock js %}

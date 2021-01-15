@@ -1,0 +1,104 @@
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">¿POR QUÉ SE NOTIFICA EL CASO COMO IRAG INUSITADO??</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>OPCIONES SELECCIONADAS</th>
+                <td>{% firstof info_general.get_seleccione_opciones_display|join:' - ' 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>¿El VIAJE FUE EN EL TERRITORIO NACIONAL?</th>
+                <td>{% firstof info_general.get_viaje_nacional_display 'SIN DATOS' %}</td>
+                <th>DEPARTAMENTO</th>
+                <td>{% firstof info_general.municipio_viaje_nacional.departamento 'SIN DATOS' %}</td>
+                <th>MUNICIPIO</th>
+                <td>{% firstof info_general.municipio_viaje_nacional 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>¿El VIAJE FUE EN TERRITORIO INTERNACIONAL?</th>
+                <td>{% firstof info_general.get_viaje_internacional_display 'SIN DATOS' %}</td>
+                <th>PAÍS</th>
+                <td>{% firstof info_general.pais_viaje_iternacional 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>RECUERDE QUE LOS CASOS DE IRAG INUSITADO SIEMPRE DEBEN TENER TOS Y FIEBRE</th>
+                <td>{% firstof info_general.get_caso_irag_display|join:' - ' 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">ANTECEDENTES VACUNALES</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>STREPTOCOCCUS PNEUMONIAE (NEUMOCOCO)</th>
+                <td>{% firstof info_general.get_neumococo_display 'SIN DATOS' %}</td>
+                <th>DOSIS</th>
+                <td>{% firstof info_general.dosis_neumococo 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>INFLUENZA ESTACIONAL</th>
+                <td>{% firstof info_general.get_influenza_estacional_display 'SIN DATOS' %}</td>
+                <th>DOSIS</th>
+                <td>{% firstof info_general.dosis_influenza_estacional 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">ANTECEDENTES CLÍNICOS</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>ANTECEDENTES</th>
+                <td>{% firstof info_general.get_antecedentes_clinicos_display|join:' - ' 'SIN DATOS' %}</td>
+                <th>OTROS</th>
+                <td>{% firstof info_general.otros_antecedentes_clinicos 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">DIAGNÓSTICO Y TRATAMIENTO</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>HALLAZGOS RADIOGRAFÍA DE TÓRAX</th>
+                <td>{% firstof info_general.get_radiografia_torax_display 'SIN DATOS' %}</td>
+                <th>¿USÓ ANTIBIÓTICO EN LA ÚLTIMA SEMANA?</th>
+                <td>{% firstof info_general.get_antibiotico_ultimas_semanas_display 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>¿USÓ ANTIVIRALES EN LA ÚLTIMA SEMANA?</th>
+                <td>{% firstof info_general.get_uso_antivirales_display 'SIN DATOS' %}</td>
+                <th>FECHA DE INICIO DE ANTIVIRAL</th>
+                <td>{% firstof info_general.fecha_antiviral|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>SERVICIO EN EL QUE SE HOSPITALIZÓ</th>
+                <td>{% firstof info_general.get_servicio_hospitalizo_display 'SIN DATOS' %}</td>
+                <th>FECHA DE INGRESO A LA UCI</th>
+                <td>{% firstof info_general.fecha_ingreso_uci|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>COMPLICACIONES</th>
+                <td>{% firstof info_general.get_complicaciones_display|join:' - ' 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>

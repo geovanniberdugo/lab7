@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block heading %}RAD. {{ ingreso.radicado }}{% endblock heading %}
+
+{% block content %}
+    <button type="button" class="btn btn-default btn-sm hidden-print" id="imprimir">
+        <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+    </button>
+    <div class="hidden-print"><br></div>
+
+    {% for muestra in ingreso.muestras.all %}
+        <div class="barcod row">
+            <div class="col-md-2 barc">
+                <img src="{% get_media_prefix %}barcode/{{ muestra }}.svg">
+            </div>
+            <div class="col-md-5">
+                {% if ingreso.tipo == 'agua' %}
+                <p class="barcode-p-print">{{ muestra.informacion_general.poblado.municipio.departamento|upper }}-{{ muestra.informacion_general.poblado.municipio|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.informacion_general.poblado.nombre|upper }}</p>
+                <p class="barcode-p-print">COD. PUNTO {{ muestra.codigo_punto.codigo }}</p>
+                <p class="barcode-p-print">{{ muestra.informacion_general.poblado.epsa|upper }}</p>
+                {% elif ingreso.tipo == 'clinica' %}
+                <p class="barcode-p-print">{{ muestra.paciente.nombre|upper }} {{ muestra.paciente.apellido|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.paciente.identificacion }}</p>
+                <p class="barcode-p-print">{{ pruebas_total|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.clinica.municipio.departamento|upper }}-{{muestra.clinica.municipio|upper}}</p>
+                {% elif ingreso.tipo == 'entomologia' %}
+                <p class="barcode-p-print">{{ muestra.lugar_recoleccion.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.lugar_recoleccion.municipio.departamento|upper }}-{{ muestra.lugar_recoleccion.municipio|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.tipo_muestra|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.tipo_vigilancia|upper }}</p>
+                {% elif ingreso.tipo == 'citohistopatologia' %}
+                <p class="barcode-p-print">{{ muestra.paciente.nombre|upper }} {{ muestra.paciente.apellido|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.paciente.identificacion }}</p>
+                <p class="barcode-p-print">{{ muestra.institucion.municipio.departamento|upper }}-{{muestra.institucion.municipio|upper}}</p>
+                <p class="barcode-p-print">{{ muestra.control|upper }}</p>
+                {% elif ingreso.tipo == 'banco de sangre' %}
+                <p class="barcode-p-print">{{ muestra.paciente.nombre|upper }} {{ muestra.paciente.apellido|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.paciente.identificacion }}</p>
+                <p class="barcode-p-print">{{ muestra.institucion.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.institucion.municipio.departamento|upper }}-{{muestra.institucion.municipio|upper}}</p>
+                {% elif ingreso.tipo == 'evaluacion externa desempeño directo' %}
+                <p class="barcode-p-print">{{ muestra.institucion.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.institucion.nit|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.control|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.institucion.municipio.departamento|upper }}-{{muestra.institucion.municipio|upper}}</p>
+                {% elif ingreso.tipo == 'evaluacion externa desempeño indirecto' %}
+                <p class="barcode-p-print">{{ muestra.institucion.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.programa.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.control|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.institucion.municipio.departamento|upper }}-{{muestra.institucion.municipio|upper}}</p>
+                {% elif ingreso.programa.nombre == 'alimentos' %}
+                <p class="barcode-p-print">{{ muestra.registro_sanitario|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.ano_vencimiento }}-{{ muestra.mes_vencimiento }}-{{ muestra.dia_vencimiento }}</p>
+                <p class="barcode-p-print">{{ muestra.propietario|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.lote|upper }}</p>
+                {% elif ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                <p class="barcode-p-print">{{ muestra.producto.grupo.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.producto.nombre|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.informacion_general.poblado.municipio|upper }}-{{muestra.informacion_general.poblado.municipio.departamento|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.informacion_general.insitucion.nombre|upper }}</p>
+                <p class="barcode-p-print">{% for area in muestra.areas %}{% if forloop.first %}{{ area|upper }}{% else %}, {{ area|upper }}{% endif %}{% endfor %}</p>
+                {% else %}
+                <p class="barcode-p-print">{{ muestra.paciente.nombre|upper }} {{ muestra.paciente.apellido|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.paciente.tipo_identificacion }} {{ muestra.paciente.identificacion }}</p>
+                {% if muestra.informacion_general.info_paciente.tipificacion %}
+                <p class="barcode-p-print">{{ muestra.informacion_general.info_paciente.tipificacion }}</p>
+                {% endif %}
+                <p class="barcode-p-print">{{ pruebas_total|upper }}</p>
+                <p class="barcode-p-print">{{ muestra.departamento_upgd|upper }}-{{muestra.municipio_upgd|upper}}</p>
+                {% endif %}
+                <p class="barcode-p-print"><strong>{{ ingreso.programa|upper}}</strong></p>
+            </div>
+        </div>
+        <br>
+        <br>
+{% endfor %}
+
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#imprimir').click(function(){
+            window.print();
+            document.location.href = "{% url 'trazabilidad:ingresos' %}";
+        });
+    });
+    </script>
+{% endblock %}

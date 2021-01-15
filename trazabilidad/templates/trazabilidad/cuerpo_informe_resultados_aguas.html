@@ -1,0 +1,154 @@
+{% with info=muestra.informacion_general  %}
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th class="wd-10">DEPARTAMENTO</th>
+        <td>{{ info.poblado.municipio.departamento|upper }}</td>
+        <th class="wd-10">MUNICIPIO</th>
+        <td>{{ info.poblado.municipio|upper }}</td>
+        <th class="wd-8">POBLADO</th>
+        <td>{{ info.poblado|upper }}</td>
+    </tr>
+</table>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th class="wd-4">EPSA</th>
+        <td>{{ info.poblado.epsa.nombre|upper }}</td>
+        <th class="wd-8">DIRECCION</th>
+        <td>{{ info.poblado.epsa.direccion|upper }}</td>
+        <th class="wd-4">NIT</th>
+        <td>{{ info.poblado.epsa.nit|upper }}</td>
+    </tr>
+</table>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <table class="table table-bordered">
+            <tr>
+                <th>FECHA DE RECOLECCION</th>
+                <td>{{ info.fecha_recoleccion|date:"j \d\e F \d\e Y"|upper }}</td>
+                <th>SOLICITANTE</th>
+                <td>{{ info.solicitante|upper }}</td>
+                <th>RESPONSABLE DE LA TOMA</th>
+                <td>{{ info.responsable_toma|upper }}</td>
+                <th>COD. DEL PUNTO</th>
+                <td>{{ muestra.codigo_punto|upper }}</td>
+            </tr>
+            <tr>
+                <th>HORA DE LA TOMA</th>
+                <td>{{ muestra.hora_toma|upper }}</td>
+                <th>TIPO DE AGUA</th>
+                <td>{{ info.tipo_agua|upper }}</td>
+                <th>TEMPERATURA</th>
+                <td>{{ info.temperatura|upper }}</td>
+                <th>CONCERTADO</th>
+                {% if muestra.concertado == True %}
+                <td>SI</td>
+                {% elif muestra.concertado == False %}
+                <td>NO</td>
+                {% else %}
+                <td>{{ muestra.concertado|upper }}</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>DIRECCION PUNTO DE TOMA</th>
+                <td>{{ muestra.codigo_punto.direccion|upper }}</td>
+                <th>LUGAR PUNTO DE TOMA</th>
+                <td>{{ muestra.codigo_punto.lugar_toma|upper }}</td>
+                <th>DESCRIPCION</th>
+                <td colspan="3">{{ muestra.codigo_punto.descripcion|upper }}</td>
+            </tr>
+            <tr>
+                <th colspan="2">FUENTE ABASTECIMIENTO</th>
+                <td colspan="2">{{ muestra.codigo_punto.fuente_abastecimiento|upper }}</td>
+                <th>MOTIVO ANALISIS</th>
+                <td colspan="3">{{ muestra.motivo_analisis|upper }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endwith %}
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <table class="table table-bordered margin-tables-print">
+            <tr>
+                <th class="wd-35">PROPÓSITO GÉNERAL DE LA PRUEBA</th>
+                <td>{{ informe.objeto|striptags|upper }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 panel-print">
+        <h4 class="header-print">EMISIÓN DE RESULTADOS</h4>
+    </div>
+</div>
+<div class="row radicado-muestra">
+    <div class="col-xs-12 margin-tables-print">
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th colspan="4" class="text-center">
+                    <p class="base-text">{{ ingreso.radicado }}-{{ forloop.counter }}</p>
+                </th>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12">
+        <table class="table table-striped table-bordered">
+            {% regroup muestra.pruebasrealizadas_set.all by prueba.area as pruebas_agrupadas %}
+            {% for grupo in pruebas_agrupadas %}
+            <colgroup>
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th colspan="{% if not grupo.list.0.prueba.area.oculto %}3{% else %}5{% endif %}">{{ grupo.grouper|upper }}</th>
+                </tr>
+                <tr>
+                    <th>PRUEBA</th>
+                    <th>RESULTADO</th>
+                    <th>VALORES DE REFERENCIA</th>
+                    {% if not grupo.list.0.prueba.area.oculto %}
+                    <th>MÉTODO UTILIZADO</th>
+                    <th>CONCEPTO ANALISTA</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for prueba_realizada in grupo.list %}
+                <tr>
+                    <td class="text-uppercase">{{ prueba_realizada.prueba.nombre }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.resultado_numerico }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.prueba.valores_referencia }}</td>
+                    {% if not grupo.list.0.prueba.area.oculto %}
+                    <td class="text-uppercase">{{ prueba_realizada.metodo }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.concepto }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>% IRCA BÁSICO</th>
+                <td>{{ muestra.irca|floatformat:"2" }}%</td>
+                <th>NIVEL DE RIESGO</th>
+                <td>{{ muestra.get_clasificacion_irca }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th style="width: 40%;">TEMPERATURA DE PROCESAMIENTO DE LA MUESTRA</th>
+        <td>{{ muestra.temp_procesamiento }} ºC</td>
+    </tr>
+</table>

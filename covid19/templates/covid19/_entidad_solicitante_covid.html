@@ -1,0 +1,15 @@
+<h4>ENTIDAD SOLICITANTE</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>UPGD</th>
+        <td class="text-uppercase">{% firstof muestra.solicitante '' %}</td>
+    </tr>
+    <tr>
+        <th>MUNICIPIO</th>
+        <td class="text-uppercase">{% firstof muestra.municipio_upgd '' %}</td>
+    </tr>
+    <tr>
+        <th>DEPARTAMENTO</th>
+        <td class="text-uppercase">{% firstof muestra.departamento_upgd '' %}</td>
+    </tr>
+</table>

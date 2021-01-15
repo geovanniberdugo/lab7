@@ -1,0 +1,124 @@
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th>NOMBRES</th>
+        <td>{{ muestra.paciente.nombre|upper }}</td>
+        <th>APELLIDOS</th>
+        <td>{{ muestra.paciente.apellido|upper }}</td>
+        <th>IDENTIFICACION</th>
+        <td>{{ muestra.paciente.tipo_identificacion|upper }} {{ muestra.paciente.identificacion }}</td>
+        <th>EDAD</th>
+        <td>{% if muestra.paciente.edad %}{{ muestra.paciente.edad }} {{ muestra.paciente.get_tipo_edad_display|upper }}{% else %}SIN DATOS{% endif %}</td>
+    </tr>
+</table>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th>SEXO</th>
+        {% if muestra.paciente.sexo == 'M' %}
+        <td>MASCULINO</td>
+        {% else %}
+        <td>FEMENINO</td>
+        {% endif %}
+        <th>DIRECCION</th>
+        <td class="text-uppercase">{% firstof muestra.informacion_general.direccion 'SIN DATOS' %}</td>
+        <th>EPS-PLAN</th>
+        <td class="text-uppercase">{% firstof muestra.informacion_general.info_paciente.eapb.nombre 'SIN DATOS' %}</td>
+    </tr>
+</table>
+
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">LUGAR DE PROCEDENCIA / OCURRENCIA</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>DEPARTAMENTO</th>
+                        <td class="text-uppercase">{% firstof muestra.informacion_general.info_paciente.municipio_ocurrencia.departamento 'SIN DATOS' %}</td>
+                        <th>MUNICIPIO</th>
+                        <td class="text-uppercase">{% firstof muestra.informacion_general.info_paciente.municipio_ocurrencia 'SIN DATOS' %}</td>
+                        <th>BARRIO</th>
+                        <td class="text-uppercase">{% firstof muestra.informacion_general.info_paciente.barrio_ocurrencia 'SIN DATOS' %}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">LUGAR DE RECOLECCION</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered text-uppercase">
+                    <tr>
+                        <th>INSTITUCION</th>
+                        <td>{% firstof muestra.solicitante.nombre 'SIN DATOS' %}</td>
+                        <th>DEPARTAMENTO</th>
+                        <td>{% firstof muestra.informacion_general.info_paciente.municipio_ocurrencia.departamento 'SIN DATOS' %}</td>
+                        <th>MUNICIPIO</th>
+                        <td>{% firstof muestra.informacion_general.info_paciente.municipio_ocurrencia 'SIN DATOS' %}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th>PROPÓSITO GÉNERAL DE LA PRUEBA</th>
+        <td>{{ informe.objeto|striptags|upper }}</td>
+    </tr>
+</table>
+
+<div class="row">
+    <div class="col-xs-12 panel-print">
+        <h4 class="header-print">EMISIÓN DE RESULTADOS</h4>
+    </div>
+</div>
+
+<div class="row table-responsive">
+    <div class="col-md-12">
+        <table class="table table-striped table-bordered">
+            <colgroup>
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>PRUEBA</th>
+                    <th>RESULTADO</th>
+                    <th>MÉTODO UTILIZADO</th>
+                    <th>OBJETO DE LA PRUEBA</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prueba_realizada in muestra.pruebasrealizadas_set.all %}
+                <tr>
+                    <td class="text-uppercase">{{ prueba_realizada.prueba.nombre }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.resultados.all|join:', ' }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.metodo }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.metodo.objeto }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th style="width: 40%;">TEMPERATURA DE PROCESAMIENTO DE LA MUESTRA</th>
+        <td>{{ muestra.temp_procesamiento }} ºC</td>
+    </tr>
+</table>

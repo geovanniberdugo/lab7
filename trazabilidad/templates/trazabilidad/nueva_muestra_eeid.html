@@ -1,0 +1,195 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block tipo_muestra_heading %}De Evaluación Externa de Desempeño Indirecto{% endblock %}
+
+{% block form_errors %}
+    {% if form_institucion.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Origen de la Muestra!</strong> {{ form_institucion.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_muestra.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Muestra Evaluación Externa de Desempeño Indirecto!</strong> {{ form_muestra.errors }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_action %}
+    {% if muestra_nueva %}
+        {% url 'trazabilidad:nueva_muestra_eeid' %}
+    {% else %}
+        {% url 'trazabilidad:actualizar_muestra_eeid' form_ingreso.instance.pk %}
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo_form %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i>Origen de la Muestra
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="{{ form_institucion.institucion.css_classes }}">
+                        <label class="control-label" for="id_institucion">Institución:</label>
+                        {{ form_institucion.institucion }}
+                    </p>
+                </div>
+            </div>
+
+            <div id="institucion_nueva" {% if form_institucion.instance.pk %}class="hidden"{% endif %} >
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_institucion.nombre.css_classes }}">
+                            <label class="control-label" for="id_nombre">Nombre:</label>
+                            {{ form_institucion.nombre }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p class="{{ form_institucion.codigo.css_classes }}">
+                            <label class="control-label" for="id_codigo">Codigo:</label>
+                            {{ form_institucion.codigo }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p class="{{ form_institucion.departamento.css_classes }}">
+                            <label class="control-label" for="id_departamento">Departamento:</label>
+                            {{ form_institucion.departamento }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_institucion.municipio.css_classes }}">
+                            <label class="control-label" for="id_municipio">Municipio:</label>
+                            {{ form_institucion.municipio }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i>Muestra evaluación externa de desempeño indirecto
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.sin_identificacion.css_classes }}">
+                        <label class="control-label" for="id_eeid-sin_identificacion">Sin Identificación:</label>
+                        {{ form_muestra.sin_identificacion }}
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.nombre.css_classes }}">
+                        <label class="control-label" for="id_eeid-nombre">Nombre:</label>
+                        {{ form_muestra.nombre }}
+                    </p>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.identificacion.css_classes }}">
+                        <label class="control-label" for="id_eeid-identificacion">Identificación:</label>
+                        {{ form_muestra.identificacion }}
+                    </p>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.tipo_identificacion.css_classes }}" id="p-tipo-id">
+                        <label class="control-label" for="id_eeid-tipo_identificacion">Tipo Identificación:</label>
+                        {{ form_muestra.tipo_identificacion }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.edad.css_classes }}">
+                        <label class="control-label" for="id_eeid-edad">Edad:</label>
+                        {{ form_muestra.edad }}
+                    </p>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.tipo_edad.css_classes }}">
+                        <label class="control-label" for="id_eeid-tipo_edad">Tipo Edad:</label>
+                        {{ form_muestra.tipo_edad }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_muestra.control|as_crispy_field }}
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_muestra.programa|as_crispy_field }}
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_muestra.programado|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_muestra.tipo_evento|as_crispy_field }}
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_muestra.tipo_muestra|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_muestra.temp_ingreso|as_crispy_field }}
+                </div>
+            </div>
+
+            {% block form_pruebas %}
+                {{ block.super }}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'js/get_paciente_info.js' %}"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_institucion-institucion').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#institucion_nueva').removeClass('hidden');
+                $('#id_institucion-nit').val('');
+                $('#id_institucion-nombre').val('');
+                $('#id_institucion-codigo').val('');
+                $('#id_institucion-direccion').val('');
+            }
+            else {
+                $('#institucion_nueva').addClass('hidden');
+            }
+        });
+
+        //Llenando el municipio según el departamento
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_institucion-departamento', '#id_institucion-municipio');
+    });
+    </script>
+{% endblock %}

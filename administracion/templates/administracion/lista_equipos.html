@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block heading %}Equipo{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/jquery.bootgrid.min.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-primary pull-right" href="{% url 'administracion:nuevo_equipo' %}">Agregar Equipo</a>
+    </div>
+    </div>
+    <br>
+
+    <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+        <tr>
+            <th data-column-id="id" data-identifier="true" data-visible="false"></th>
+            <th data-column-id="nombre">Nombre</th>
+            <th data-column-id="cod">Código</th>
+            <th data-column-id="tempmin">Temperatura Máxima</th>
+            <th data-column-id="tempmax">Temperatura Mínima</th>
+            <th data-column-id="area">area</th>
+            <th data-column-id="estado">Estado</th>
+            <th data-column-id="modificacion">Ultima modificación</th>
+            <th data-column-id="modificado">Modificado por</th>
+            <th data-column-id="commands" data-formatter="commands" data-sortable="false">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for equipo in equipo_list %}
+            <tr>
+                <td>{{ equipo.id}}</td>
+                <td>{{ equipo.nombre|upper }}</td>
+                <td>{{ equipo.codigo }}</td>
+                <td>{{ equipo.temperatura_maxima }}</td>
+                <td>{{ equipo.temperatura_minima }}</td>
+                <td>{{ equipo.area|title }}</td>
+                <td>{{ equipo.get_estado_display|title }}</td>
+                <td>{{ equipo.ultima_modificacion }}</td>
+                <td>{{ equipo.modificado_por|title }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/jquery.bootgrid.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tables.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        tabla('{% url 'administracion:actualizar_equipo' 0 %}');
+    })
+</script>
+{% endblock %}

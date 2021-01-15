@@ -1,0 +1,10 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+    {% include 'trazabilidad/_estado_datos_paciente.html' with paciente=muestra_clinica %}
+    {% include 'trazabilidad/_estado_procedencia_ocurrencia.html' with procedencia=muestra_clinica %}
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'trazabilidad:estado_muestra_clinica' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'trazabilidad:actualizar_muestra_clinica' ingreso.id %}{% endblock %}

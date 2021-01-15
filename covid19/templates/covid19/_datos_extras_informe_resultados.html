@@ -1,0 +1,23 @@
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">DATOS SOLICITANTE</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="wd-15">UPGD</th>
+                        <td>{{ muestra.solicitante.nombre|upper }}</td>
+                        <th class="wd-15">DEPARTAMENTO</th>
+                        <td>{{ muestra.departamento_upgd|upper }}</td>
+                        <th class="wd-15">MUNICIPIO</th>
+                        <td>{{ muestra.municipio_upgd|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

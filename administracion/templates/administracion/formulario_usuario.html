@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block heading%}Usuario{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/bootstrap-select.min.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-primary">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        {% crispy form %}
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/bootstrap-select.min.js' %}"></script>
+<script type="text/javascript">
+    (() => {
+        const infoEmpleado = document.querySelector('.info-empleado');
+        const isEmpleado = document.getElementById('id_empleado');
+        
+        window.addEventListener('load', () => {
+            if (isEmpleado.checked) {
+                infoEmpleado.classList.remove('hidden');
+            } else {
+                infoEmpleado.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('id_empleado').addEventListener('change', ({ target }) => {
+            if (target.checked) {
+                infoEmpleado.classList.remove('hidden');
+            } else {
+                infoEmpleado.classList.add('hidden');
+            }
+        });
+    })();
+    $(document).ready(function(){
+        $('#id_grupos').select2("destroy");
+        $('#id_grupos').selectpicker({
+            noneSelectedText: "Ninguno Seleccionado"
+        });
+        $('#id_areas').select2("destroy");
+        $('#id_areas').selectpicker({
+            noneSelectedText: "Ninguno Seleccionado"
+        });
+        $('#id_tipo_empleado').select2("destroy");
+        $('#id_tipo_empleado').selectpicker();
+    })
+</script>
+{% endblock %}

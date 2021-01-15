@@ -1,0 +1,241 @@
+#login {
+    position: relative;
+    overflow: hidden;
+    height: 300px;
+}
+
+#login::before {
+    content: ' ';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+    background-image: url(/static/img/escudo_gobernacion.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    -ms-background-size: 40%;
+    -o-background-size: 40%;
+    -moz-background-size: 40%;
+    -webkit-background-size: 40%;
+    background-size: 40%;
+}
+
+#img-encabezado {
+    vertical-align: middle;
+}
+
+.header-break {
+    font-size: 50%;
+}
+
+.header-break p {
+    margin-bottom: 0px;
+}
+
+.radicado {
+    color: #080808;
+    font-size: 35px;
+    font-weight: bolder;
+}
+
+.usuario {
+    font-size: 35px;
+}
+
+.alert {
+    padding: 40px;
+}
+
+.ui-datepicker-month {
+   color: #333;
+ }  
+
+ .ui-datepicker-year {
+   color: #333;
+ }
+
+ .dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+
+.btn-primary.disabled, .btn-primary[disabled], fieldset[disabled] .btn-primary, .btn-primary.disabled:hover, .btn-primary[disabled]:hover, fieldset[disabled] .btn-primary:hover, .btn-primary.disabled:focus, .btn-primary[disabled]:focus, fieldset[disabled] .btn-primary:focus, .btn-primary.disabled.focus, .btn-primary.focus[disabled], fieldset[disabled] .btn-primary.focus, .btn-primary.disabled:active, .btn-primary[disabled]:active, fieldset[disabled] .btn-primary:active, .btn-primary.disabled.active, .btn-primary.active[disabled], fieldset[disabled] .btn-primary.active {
+    background-color: #CC0000;
+    border-color: #ae0000;
+}
+
+.btn-primary {
+    color: #FFF;
+    background-color: #CC0000;
+    border-color: #ae0000;
+}
+
+.panel-primary {
+    border-color: #CC0000;
+}
+
+.panel-primary > .panel-heading {
+    color: #FFF;
+    background-color: #CC0000;
+    border-color: #CC0000;
+}
+
+.dash-label {
+    color: #555555;
+    display: block;
+}
+
+.dash-icon {
+    color: #CC0000;
+    font-size: 40px;
+}
+
+.barcode {
+    border: solid;
+    height: 175px;
+    position: absolute;
+}
+
+.barcod{
+    border: black solid 3px;
+    position: relative;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.barcod img {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    /*margin: 0 0 auto;*/
+    height: 100%;
+    position: relative;
+    margin-top: 21px;
+    top: 0px;
+    /*position: relative;*/
+    /*top: 36px;*/
+}
+
+.barcode-p-print {
+    text-align: center;
+    line-height: 18px;
+}
+
+@media (min-width: 768px) {
+    .center-menu {
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, 0);
+    }
+}
+
+@media print {
+    table {
+        font-size:7px;
+        margin-bottom: 5px;
+    }
+
+    th, td {
+        padding: 2px !important;
+    }
+
+    .text-center {
+        font-size:4px;
+    }
+
+    h3{
+       font-size:12px; 
+    }
+
+    h4{
+       font-size:9px; 
+    }    
+
+    h2,h3{
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    img {
+        height: 30px;
+    }
+
+    .page{
+        margin-top: 5px;
+        margin-right: 0px;
+        margin-bottom: 5px;
+    }
+
+    .barcod{
+        height: 95px !important;
+        width: 132px;
+        border: black solid 2px;
+        padding: 15px;
+        padding-right: 0;
+    }
+
+    .barc{
+        padding-right: 0;
+    }
+
+    .barc img{
+        width: 65px;
+        top: -13px;
+        left: -43px;
+        height: 45px;
+    }
+
+    .barcode-p-print{
+        text-align: center;
+        line-height: 5px;
+        font-size: 5px;
+        position: relative;
+        top:-69px;
+        left: 10px;
+    }
+}

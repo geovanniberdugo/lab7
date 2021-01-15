@@ -1,0 +1,55 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+	<h4>ENTIDAD SOLICITANTE</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>SOLICITANTE</th>
+            <td>{{ general.solicitante|upper }}</td>
+        </tr>
+        <tr>
+            <th>DIRECCIÓN</th>
+            <td>{{ general.direccion|upper }}</td>
+        </tr>
+        <tr>
+            <th>RESPONSABLE</th>
+            <td>{{ general.responsable|upper }}</td>
+        </tr>
+        <tr>
+            <th>CARGO</th>
+            <td>{{ general.cargo|upper }}</td>
+        </tr>
+    </table>
+
+    <h4>LUGAR DE RECOLECCIÓN</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>DEPARTAMENTO</th>
+            <td>{{ general.poblado.municipio.departamento|upper }}</td>
+        </tr>
+        <tr>
+            <th>MUNICIPIO</th>
+            <td>{{ general.poblado.municipio|upper }}</td>
+        </tr>
+        <tr>
+            <th>POBLADO</th>
+            <td>{{ general.poblado|upper }}</td>
+        </tr>
+        <tr>
+            <th>PUNTO DE TOMA</th>
+            <td>{{ general.sitio_toma|upper }}</td>
+        </tr>
+        <tr>
+            <th>DIRECCIÓN</th>
+            <td>{{ general.direccion_recoleccion|upper }}</td>
+        </tr>
+        <tr>
+            <th>FECHA</th>
+            <td>{{ general.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+        </tr>
+    </table>
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'alimentos:estado_muestra' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'alimentos:actualizar_muestra' ingreso.id %}{% endblock %}

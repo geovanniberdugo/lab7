@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags static l10n %}
+
+{% block title %}Radicado{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/informes.css' %}">
+{% endblock css %}
+
+{% block heading %}
+    {% if imprimir %}
+        {% if ingreso.estado == 'A' %}
+            {% include 'trazabilidad/_encabezado_informes.html' with titulo='orden de procesamiento' %}
+        {% else %}
+            {% include 'trazabilidad/_encabezado_informes.html' with titulo='formato de rechazo de muestra' %}
+        {% endif %}
+    {% else %}
+        ESTADO DEL INGRESO
+    {% endif %}
+{% endblock heading %}
+
+{% block content %}
+    <div>
+        {% if imprimir %}
+            <button type="button" class="btn btn-default btn-sm hidden-print" id="imprimir">
+                <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
+            </button>
+        {% endif %}
+        <a href="{% url 'trazabilidad:codigos_muestras_ingreso' ingreso.id %}" class="btn btn-default btn-sm hidden-print">
+            <span class="fa fa-barcode" aria-hidden="true"></span>
+        </a>
+        {% if not ingreso.confirmada %}
+            <a href="{% block edit_url %}{% endblock %}" class="btn btn-default btn-sm hidden-print">
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="pull-right">
+    <h3 class="">RADICADO NO. {{ ingreso.radicado }}</h3>
+    <div class="row text-center">
+    <img src="{% get_media_prefix %}barcode/{{ ingreso.radicado }}.svg">
+    </div>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <th>FECHA RECEPCIÓN</th>
+            <td>{{ ingreso.fecha_radicado|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+        </tr>
+    </table>
+
+    {% block informacion_muestra %}
+    {% endblock %}
+
+    {% if imprimir %}
+        {% if ingreso.motivo_rechazo.count > 0 %}
+            <h4>MOTIVOS DE RECHAZO</h4>
+
+            <ul>
+                {% for motivo in ingreso.motivo_rechazo.all %}
+                    <li>{{ motivo.motivo|upper }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if ingreso.observaciones %}
+        <h4>OBSERVACIONES</h4>
+        <table class="table table-bordered">
+            <tr>
+                <td>{{ ingreso.observaciones|upper }}</td>
+            </tr>
+        </table>
+        {% endif %}
+
+        {% if not ingreso.confirmada and ingreso.estado == 'A' %}
+            <h4 class="text-uppercase text-center">INGRESO PROCESADO PARCIALMENTE PARA VERIFICACIÓN</h4>
+        {% endif %}
+    {% endif %}
+
+    {% if not imprimir %}
+        <form action="{% block form_action %}{% endblock %}" method="POST">
+            {% csrf_token %}
+
+            {{ form|crispy }}
+
+            {% if not ingreso.confirmada %}
+                <h4 class="text-uppercase text-center">INGRESO PROCESADO PARCIALMENTE PARA VERIFICACIÓN</h4>
+            {% endif %}
+
+            <button class="btn btn-primary" name="enviar">ENVIAR</button>
+        </form>
+    {% endif %}
+
+    <div class="row text-center">
+    <img src="{% get_media_prefix %}barcode/{{ ingreso.radicado }}.svg">
+    </div>
+    <br>
+    <div class="row">
+        <div class="row text-center">
+            <img src="{% static 'img/logo_gobernacion.png' %}" width="300px">
+        </div>
+    </div>
+    <br>     
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+    $('#div_id_motivo_rechazo').addClass('hidden');
+    $('.rechazo_check').prop('checked', false);
+    $(document).ready(function(){
+        $('#id_estado').change(function(){
+            var valor = $(this).val();
+            if (valor=='R') {
+                $('#div_id_motivo_rechazo').removeClass('hidden');
+            }
+            else {
+                if (!$('#div_id_motivo_rechazo').hasClass('hidden')) {
+                    $('#div_id_motivo_rechazo').addClass('hidden');
+                    $('.rechazo_check').prop('checked', false)
+                }
+            }
+        });
+
+        $('#imprimir').click(function(){
+            window.print();
+        });
+    });
+    </script>
+{% endblock %}

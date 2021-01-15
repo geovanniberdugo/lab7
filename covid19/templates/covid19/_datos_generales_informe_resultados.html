@@ -1,0 +1,36 @@
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th class="wd-8">NOMBRES</th>
+        <td>{{ muestra.paciente.nombre|upper }}</td>
+        <th class="wd-8">APELLIDOS</th>
+        <td>{{ muestra.paciente.apellido|upper }}</td>
+        <th class="wd-12">DOCUMENTO ID</th>
+        <td>{{ muestra.paciente.tipo_identificacion|upper }} {{ muestra.paciente.identificacion }}</td>
+        <th class="wd-8">EDAD</th>
+        <td>{{ muestra.paciente.edad }} {{ muestra.paciente.get_tipo_edad_display|upper }}</td>
+    </tr>
+</table>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th class="wd-8">SEXO</th>
+        {% if muestra.paciente.sexo == 'M' %}
+        <td class="wd-8">MASCULINO</td>
+        {% else %}
+        <td class="wd-8">FEMENINO</td>
+        {% endif %}
+        <th class="wd-8">DIRECCION</th>
+        <td>{{ muestra.informacion_general.direccion|upper }}</td>
+        <th class="wd-8">EPS-PLAN</th>
+        <td>{{ muestra.paciente.eps.nombre|upper }}</td>
+    </tr>
+</table>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th class="wd-8">PAIS RESIDENCIA</th>
+        <td class="wd-8">{{ muestra.pais_residencia.name|upper }}</td>
+        <th class="wd-8">DEPARTAMENTO RESIDENCIA</th>
+        <td>{{ muestra.departamento_residencia|upper }}</td>
+        <th class="wd-8">MUNICIPIO RESIDENCIA</th>
+        <td>{{ muestra.municipio_residencia|upper }}</td>
+    </tr>
+</table>

@@ -1,0 +1,110 @@
+@page {
+    size: letter portrait;
+    margin: 3.5cm 0.05cm 3.5cm;
+}
+
+@media print {
+    .base-text {
+        font-size: 8px;
+    }
+
+    /* Header */
+    .page-header {
+        position: fixed;
+        top: 0;
+        height: 3cm;
+        margin: -3.4cm 0 0;
+        width: 20.8cm;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .page-header h2 {
+        margin: 0;
+    }
+
+    .page-header table {
+        margin-bottom: 0;
+    }
+
+    .td-percent {
+        width: 15%;
+    }
+
+    .img-header {
+        width: 65px;
+        height: 65px;
+    }
+
+    .header-print {
+        font-size: 14px;
+    }
+
+    /* Footer */
+    footer {
+        bottom: 0;
+        height: 2.9cm;
+        position: fixed;
+        margin-bottom: -3cm;
+    }
+
+    footer .base-text {
+        font-size: 7px;
+    }
+
+    footer .row {
+        margin-left: -0.2cm;
+        margin-right: 0.5cm;
+    }
+
+    #footer-ficha-covid {
+        width: 100%;
+        height: 1.9cm;
+    }
+
+    /* Contenido */
+    h4 {
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: 10px !important;
+    }
+
+    table {
+        font-size: 8.2px;
+    }
+
+    #num-radicado- {
+        margin-top: -0.5cm;
+    }
+
+    .radicado-print {
+        font-size: 12px;
+    }
+
+    .radicado-muestra p {
+        margin-bottom: 0;
+    }
+
+    #final {
+        page-break-inside: avoid;
+    }
+
+    #end {
+        page-break-after: always;
+    }
+}
+
+table {
+    margin-bottom: 0 !important;
+}
+
+#img-footer {
+    width: 300px;
+}
+
+.signature p {
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}

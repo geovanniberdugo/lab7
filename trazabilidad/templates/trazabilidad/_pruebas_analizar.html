@@ -1,0 +1,122 @@
+{% load crispy_forms_tags staticfiles utils %}
+
+{% for muestra in ingreso.muestras.all %}
+    <div class="panel panel-primary">
+    <div class="panel-heading text-center">{{ ingreso.radicado }}{% if ingreso.programa.nombre == 'aguas' or ingreso.programa.nombre == "alimentos"  or ingreso.programa.codigo == "bebidas_alcoholicas" %}-{{ forloop.counter }}{% endif %}</div>
+    <table class="table">
+    {% regroup muestra.pruebasrealizadas_set.all by prueba.area as pruebas_agrupadas %}
+    {% for grupo in pruebas_agrupadas %}
+        {% if ingreso.programa.codigo == "bebidas_alcoholicas" and not muestra.decreto %}
+            <tr>
+                <th class="text-center">{{ muestra.producto.grupo|upper }}</th>
+                <th class="text-center">{{ muestra.producto|upper }}</th>
+                <th class="text-center" style="width: 5% !important;">Establecer</th>
+            </tr>
+            <tr>
+                <th>Normatividad</th>
+                <td>
+                    <form id="form-decreto-{{ muestra.id }}" action="{% url 'bebidas_alcoholicas:decreto_muestras' muestra.id %}" method="POST">
+                    {% csrf_token %}
+                    <select name="decreto" id="id_decreto-{{ muestra.id }}" class="form-control">
+                        {% for decreto in muestra.producto.grupo.decretos.all %}
+                        <option value="{{ decreto.id}}" {% if forloop.first %}selected{% endif %}>{{ decreto }}</option>
+                        {% endfor %}
+                    </select>
+                    </form>
+                </td>
+                <td style="width: 5% !important;"><button class="btn btn-primary fa fa-check set-decreto" form="form-decreto-{{muestra.id}}"></button></td>
+            </tr>
+        {% elif ingreso.programa.nombre == 'alimentos' and not grupo.grouper.id in muestra.decretos|values_list:'area__id' %}
+            <tr>
+                <th colspan="1" class="text-center">{{ muestra.tipo|upper }}</th>
+                <th colspan="2" class="text-center">{{ grupo.grouper|upper }}</th>
+                <th colspan="2" class="text-center" style="width: 5% !important;">Establecer</th>
+            </tr>
+            <tr>
+                <th colspan="1">Normatividad</th>
+                <td colspan="2">
+                    <form id="form-decreto-{{ muestra.id }}"action="{% url 'alimentos:decreto_muestras' muestra.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="area" value="{{ grupo.grouper.id }}">
+                    <select name="decretos" id="id_decreto-{{ muestra.id }}" class="form-control">
+                        {% for decreto in muestra.tipo.decreto_set.all|filter_by_area:grupo.grouper %}
+                        <option value="{{ decreto.id }}" {% if forloop.first %}selected{% endif %}>{{ decreto }}</option>
+                        {% endfor %}
+                    </select>
+                    </form>
+                </td>
+                <td style="width: 5% !important;"><button class="btn btn-primary fa fa-check set-decreto" form="form-decreto-{{muestra.id}}"></button></td>
+            </tr>
+        {% else %}
+            <tr><th colspan="{% if ingreso.has_valores_referencia %}5{% else %}4{% endif %}" class="text-center">{{ grupo.grouper|upper }}</th></tr>
+            <tr>
+                <th>Prueba</th>
+                <th>Estado</th>
+                {% if ingreso.has_valores_referencia %}
+                <th>Valores de Referencia</th>
+                {% endif %}
+                <th>Cumplimiento</th>
+                {% if forloop.first %}
+                <th>{% if ingreso.can_actualizar_estado_todas_pruebas %}<a href="{% url 'trazabilidad:actualizar_pruebas_muestra' muestra.id %}" id="id_actualizar_todas" style="color: #CC0000;">Actualizar todas</a>{% endif %}</th>
+                {% else %}
+                <th></th>
+                {% endif %}
+            </tr>
+            {% for prueba in grupo.list %}
+            <tr id="anchor-{{ prueba.id }}" {% if prueba.color_semaforo %}
+                    {% if prueba.color_semaforo == 'rojo' %}
+                        class="danger"
+                    {% elif prueba.color_semaforo == 'amarillo' %}
+                        class="warning"
+                    {% else %}
+                        class="success"
+                    {% endif %}
+                {% endif %} >
+                <td>{{ prueba.prueba.nombre|upper }}</td>
+                <td>{{ prueba.get_estado_display }}</td>
+                {% if ingreso.has_valores_referencia %}
+                <td>{{ prueba.prueba.valores_referencia }}</td>
+                {% endif %}
+                <td>{{ prueba.cumplimiento }}%</td>
+                <td>
+                    {% if not prueba.con_resultado %}
+                        {% if prueba.en_analisis %}
+                            <div id="modal-{{ prueba.id }}" class="modal fade" tabindex="-1" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">{{ prueba.prueba }}</div>
+                                        <div class="modal-body">
+                                            {% include "trazabilidad/_form_resultados_prueba.html" %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button name="enviar_estado" form="form-{{ prueba.id }}" class="btn btn-primary">Actualizar estado</button>
+                                            <button data-dismiss="modal" class="btn btn-primary">Cancelar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button data-toggle="modal" data-target="#modal-{{ prueba.id }}" data-backdrop="static" class="btn btn-primary btn-xs">Actualizar estado</button>
+                        {% else %}
+                            <a class="btn btn-primary btn-xs boton-estado" href="{% url 'trazabilidad:actualizar_estado' prueba.id %}" role="button">
+                                Actualizar estado
+                            </a>
+                        {% endif %}
+                    {% else%}
+                        {% if not prueba.prueba.area.oculto %}
+                        <a class="btn btn-primary btn-xs" href="{% url 'trazabilidad:informe_documento_prueba' muestra.id prueba.id %}"><i class="glyphicon glyphicon glyphicon-list-alt"></i> </a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    </table>
+    </div>
+{% endfor %}
+
+<script>
+    $('select').selectpicker({
+        noneSelectedText: 'Ninguno Seleccionado'
+    });
+</script>

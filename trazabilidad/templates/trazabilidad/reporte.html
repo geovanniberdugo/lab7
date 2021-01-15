@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/_informe_nuevo_grande.css' %}">
+{% endblock %}
+
+{% block title %}Informe resultados{% endblock %}
+
+{% block heading %}
+    {% include 'trazabilidad/_encabezado_informes.html' with titulo='informe de resultados - LAB-008' %}
+{% endblock %}
+    
+{% block content %}
+{% if imprimir %}
+<div class="hidden-print">
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="col-xs-1">
+            <button type="submit" name="imprimir" class="btn btn-default btn-sm hidden-print">
+                <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+            </button>
+        </div>
+    </form>
+    <br>
+</div>
+{% endif %}
+
+{% for muestra in muestras %}
+    <div>
+        <h3 id="num-radicado-" class="pull-right radicado-print">RADICADO NO. {{ ingreso.radicado }}</h3>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <th>FECHA DEL INFORME</th>
+            <td>{{ informe.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+        </tr>
+    </table>
+
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            <h4 class="header-print">DATOS GENERALES</h4>
+            <table class="table table-bordered margin-print">
+                <tr>
+                    <th class="wd-13">Nº DE RADICACION</th>
+                    <td>{{ ingreso.radicado }}</td>
+                    <th class="wd-13">FECHA DE RECIBO</th>
+                    <td>{{ ingreso.fecha_recepcion|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+                    <th class="wd-11">FECHA DE PROCESO</th>
+                    <td>{{ ingreso.fecha_proceso|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    {% if ingreso.programa.codigo == 'aguas' %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td class="wd-4">AGUAS</td>
+                    {% elif ingreso.programa.codigo == 'alimentos' %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td class="wd-4">ALIMENTOS</td>
+                    {% elif ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td class="wd-4">BEBIDAS ALCOHÓLICAS</td>
+                    {% else %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td>
+                        {% if ingreso.tipo == 'clinica' %}
+                            {% for m in muestra.tipo_muestras.all %}
+                            {% if forloop.first %}{{ m }}{% else %}, {{ m }} {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ muestra.tipo_muestra|upper }}
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                    <th class="wd-6">AREA</th>
+                    <td>{% for area in ingreso.areas %}{% if forloop.first %}{{ area|upper }}{% else %}, {{ area|upper }}{% endif %}{% endfor %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    {% include cuerpo_informe with muestra=muestra informe=informe %}
+
+    <br>
+    {% if imprimir %}
+        <div id="final">
+        {% if muestra.observacion %}
+        <div class="row">
+            <div class="col-xs-12 panel-print">
+                <h4 class="header-print">OBSERVACIONES</h4>
+            </div>
+            <div class="col-md-12">
+                <table class="table table-bordered" style="margin-top:-10px !important;@media{margin-top:-10px !important;}">
+                    <tr>
+                        <td>{{ muestra.observacion|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        <br>
+        <div class="row panel-print">
+            <div class="col-xs-4 signature">
+                <P class="text-center">
+                    <span>{{ ingreso.analista.empleado.codigo }}</span>
+                </P>
+                <hr style="margin-top: 0;">
+                <h4 class="page radicado-print text-center">ANALISTA</h4>
+            </div>
+            <div class="col-xs-4 signature">
+                <P class="text-center">
+                    <span>{{ ingreso.responsable_tecnico.empleado.codigo }}</span>
+                </P>
+                <hr style="margin-top: 0;">
+                <h4 class="page radicado-print text-center">RESPONSABLE TECNICO</h4>
+            </div>
+            <div class="col-xs-4 signature">
+                <P class="text-center"">
+                    <img height="40px" src="{{ dominio }}{% static 'img/firma_aprobo.png' %}" alt="firma aprobo">
+                </P>
+                <hr style="margin-top: 0;">
+                <h4 class="page radicado-print text-center">APROBÓ</h4>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <p class="text-center base-text"><strong>FIN DEL INFORME</strong></p>
+        </div>
+        {% if not forloop.last %}
+            <div id="end"></div>
+        {% endif %}
+        </div>
+    {% endif %}
+{% endfor %}
+
+<footer id="footer">
+    <div class="toprint">
+        {% include 'trazabilidad/_piepagina_informes.html' %}
+    </div>
+    <div class="row panel-footer">
+        <div class="text-center">
+            <img id="img-footer"src="{{ dominio }}{% static 'img/logo_gobernacion.png' %}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="row text-center">
+            <p class="base-text" id="usuario-imprime">Informe impreso el dia {{ fecha_impresion }} por el usuario: {{ user }}</p>
+        </div>
+    </div>
+</footer>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+
+    $('#id_estado').change(function(){
+        var valor = $(this).val();
+        if (valor=='R') {
+            $('#div_id_motivo_rechazo').removeClass('hidden');
+        }
+        else {
+            $('#div_id_motivo_rechazo').addClass('hidden');
+        }
+    });
+
+    $('#imprimir').click(function(){
+        window.print();
+        {% if ingreso.confirmada %}
+            document.location.href = "{% url 'trazabilidad:analisis' %}";
+        {% else %}
+            document.location.href = "{% url 'trazabilidad:actualizar_muestra_clinica' ingreso.id %}";
+        {% endif %}
+    });
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% with paciente=muestra.paciente %}
+<h4>IDENTIFICACIÓN DEL PACIENTE</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>NOMBRES</th>
+        <td>{{ paciente.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>APELLIDOS</th>
+        <td>{{ paciente.apellido|upper }}</td>
+    </tr>
+    <tr>
+        <th>DOCUMENTO ID</th>
+        <td>{{ paciente.get_tipo_identificacion_display|upper }} {{ paciente.identificacion }}</td>
+    </tr>
+    <tr>
+        <th>EMAIL</th>
+        <td>{{ paciente.email }}</td>
+    </tr>
+    <tr>
+        <th>TIPIFICACIÓN PACIENTE</th>
+        <td class="text-uppercase">{% firstof muestra.tipificacion '' %}</td>
+    </tr>
+    <tr>
+        <th>PAIS DE RESIDENCIA</th>
+        <td>{{ muestra.pais_residencia.name|upper }}</td>
+    </tr>
+    <tr>
+        <th>DEPARTAMENTO RESIDENCIA</th>
+        <td class="text-uppercase">{% firstof muestra.departamento_residencia '' %}</td>
+    </tr>
+    <tr>
+        <th>MUNICIPIO RESIDENCIA</th>
+        <td class="text-uppercase">{% firstof muestra.municipio_residencia '' %}</td>
+    </tr>
+</table>
+{% endwith %}

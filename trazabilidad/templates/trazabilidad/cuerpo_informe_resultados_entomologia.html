@@ -1,0 +1,78 @@
+<table class="table table-bordered margin-tables-print margin-tables-print-plus">
+    <tr>
+        <th class="wd-8">NOMBRES</th>
+        <td>{{ muestra.responsable_recoleccion.nombres|upper }}</td>
+        <th class="wd-8">APELLIDOS</th>
+        <td>{{ muestra.responsable_recoleccion.apellidos|upper }}</td>
+        <th class="wd-10">TIPO DE VIGILANCIA</th>
+        <td>{{ muestra.tipo_vigilancia|upper }}</td>
+        <th class="wd-10">ESTADO DE DESARROLLO</th>
+        <td>{{ muestra.get_estado_desarrollo_display|upper }}</td>
+    </tr>
+</table>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">LUGAR DE RECOLECCIÓN</h4>
+            </div>
+        </div>
+        <table class="table table-bordered panel-print">
+            <tr>
+                <th class="wd-15">DEPARTAMENTO</th>
+                <td>{{ muestra.lugar_recoleccion.municipio.departamento|upper }}</td>
+                <th class="wd-15">MUNICIPIO</th>
+                <td>{{ muestra.lugar_recoleccion.municipio|upper }}</td>
+                <th class="wd-15">LUGAR DE RECOLECCIÓN</th>
+                <td>{{ muestra.lugar_recoleccion.nombre|upper }}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            <tr>
+                <th class="wd-35">PROPÓSITO GÉNERAL DE LA PRUEBA</th>
+                <td>{{ informe.objeto|striptags|upper }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 panel-print">
+        <h4 class="header-print">EMISIÓN DE RESULTADOS</h4>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12">
+        <table class="table table-striped table-bordered">
+            <colgroup>
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>PRUEBA</th>
+                    <th>RESULTADO</th>
+                    <th>MÉTODO UTILIZADO</th>
+                    <th>OBJETO DE LA PRUEBA</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prueba_realizada in muestra.pruebasrealizadas_set.all %}
+                <tr>
+                    <td class="text-uppercase">{{ prueba_realizada.prueba.nombre }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.resultados.all|join:', ' }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.metodo }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.metodo.objeto }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th style="width: 40%;">TEMPERATURA DE PROCESAMIENTO DE LA MUESTRA</th>
+        <td>{{ muestra.temp_procesamiento }} ºC</td>
+    </tr>
+</table>

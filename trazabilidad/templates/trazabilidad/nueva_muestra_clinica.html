@@ -1,0 +1,210 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block tipo_muestra_heading %}Clinicas{% endblock %}
+
+{% block form_errors %}
+    {% if form_paciente.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Datos del Paciente!</strong> {{ form_paciente.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_institucion.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formulario Lugar de Recolección!</strong> {{ form_institucion.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_muestra.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formulario Muestra Clinica!</strong> {{ form_muestra.errors }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_action %}
+    {% if muestra_nueva %}
+        {% url 'trazabilidad:nueva_muestra_clinica' %}
+    {% else %}
+        {% url 'trazabilidad:actualizar_muestra_clinica' form_ingreso.instance.pk %}
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo_form %}
+    {% include "trazabilidad/_form_paciente.html" %}
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Lugar de Procedencia/Ocurrencia
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.departamento.css_classes }}">
+                        <label class="control-label" for="id_departamentom">Departamento:</label>
+                        {{ form_muestra.departamento }}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.municipio.css_classes }}">
+                        <label class="control-label" for="id_municipio">Municipio:</label>
+                        {{ form_muestra.municipio }}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <p class="{{ form_muestra.barrio.css_classes }}">
+                        <label class="control-label" for="id_barrio">Barrio:</label>
+                        {{ form_muestra.barrio }}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Institución Remitente
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-5">
+                    <p class="{{ form_institucion.institucion.css_classes }}">
+                        <label class="control-label" for="id_institucion">institución:</label>
+                        {{ form_institucion.institucion }}
+                    </p>
+                </div>
+            </div>
+
+            <div id="institucion_nueva" {% if form_institucion.instance.pk %}class="hidden"{% endif %} >
+                <div class="row">
+                    <div class="col-md-5">
+                        <p class="{{ form_institucion.nombre.css_classes }}">
+                            <label class="control-label" for="id_nombre">Nombre:</label>
+                            {{ form_institucion.nombre }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="{{ form_institucion.departamento.css_classes }}">
+                            <label class="control-label" for="id_departamento">Departamento:</label>
+                            {{ form_institucion.departamento }}
+                        </p>
+                    </div>
+                    <div class="col-lg-4">
+                        <p class="{{ form_institucion.municipio.css_classes }}">
+                            <label class="control-label" for="id_municipio">Municipio:</label>
+                            {{ form_institucion.municipio }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Muestra Clínica
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_muestra.tipo_muestras|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_muestra.area|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_muestra.temp_ingreso|as_crispy_field }}
+                </div>
+            </div>
+            {% block form_pruebas %}
+                {{ block.super }}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock cuerpo_form %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="{% static 'js/get_paciente_info.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+
+        get_paciente_info("{% url 'trazabilidad:detalle_paciente_json' 0 %}");
+
+        $('#id_institucion-institucion').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#id_institucion-nombre').val("");
+                $('#id_institucion-departamento').val("");
+                llenar_select('#id_institucion-municipio', []);
+
+                $('#institucion_nueva').removeClass('hidden');
+            }
+            else {
+                $('#institucion_nueva').addClass('hidden');
+            }
+        });
+
+        //Llenando el municipio según el departamento
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_institucion-departamento', '#id_institucion-municipio');
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_clinica-departamento', '#id_clinica-municipio');
+        $('#id_clinica-area').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#div_pruebas').html('<label class="control-label" for="id_pruebas">Pruebas Solicitadas:</label>');
+            }
+            else {
+                $.getJSON("{% url 'trazabilidad:lista_pruebas_area_json' 0 %}".replace(0, id), function(response){
+                    console.log(response);
+                    $('#div_pruebas').html('<label class="control-label" for="id_pruebas">Pruebas Solicitadas:</label>');
+                    $(response).each(function(i) {
+                        var valor_json = response[i];
+                        console.log(valor_json);
+                        $('#div_pruebas').append(
+                                '<div class="checkbox">' +
+                                '<label for="id_clinica-pruebas_' + i + '">' +
+                                '<input id="id_clinica-pruebas_' + i +'" type="checkbox" ' +
+                                'value="' + valor_json.id + '" name="clinica-pruebas">' +
+                                valor_json.nombre.toUpperCase() + '</label></div>'
+                        );
+                    });
+                });
+            }
+        });
+
+        $('#id_clinica-embarazada').on('change',function(){
+        });
+
+        $('#id_paciente-sexo').on('change',function(){
+            if ($('#id_paciente-sexo').val() == 'F'){
+                $('#embarazada').removeClass('hidden');
+            } else {
+                if ($('#embarazada').hasClass('hidden')) {
+                    $(this).removeClass('hidden');
+                } else {
+                    $('#embarazada').addClass('hidden');
+                }
+            }
+        });
+
+        $(window).load(function(){
+            if ($('#id_paciente-sexo').val() == 'F') {
+                $('#embarazada').removeClass('hidden');
+            }
+        })
+
+    });
+    </script>
+{% endblock %}

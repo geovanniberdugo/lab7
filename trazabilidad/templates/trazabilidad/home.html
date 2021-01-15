@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load utils waffle_tags %}
+
+{% block heading %}
+{% endblock %}
+
+{% block content %}
+    {% with es_superusuario=user|pertenece_grupo:"super usuario" recepcinista_clinico=user|pertenece_grupo:"recepcion muestras clinicas" recepcinista_ambiente=user|pertenece_grupo:"recepcion muestras de ambiente"  %}
+    <div class="row">
+    {% if perms.administracion.can_see_ingresos_recepcionados %}
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:ingresos' %}">
+            <i class="fa fa-inbox dash-icon"></i> 
+            <div class="dash-label"><h4>Solicitudes Recepcionadas</h4></div>
+        </a>
+    </div>
+    {% endif %}
+    {% if perms.administracion.can_see_analisis %}
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:analisis' %}">
+            <i class="fa fa-flask dash-icon"></i>
+            <div class="dash-label"><h4>Análisis</h4></div>
+        </a>
+    </div>
+    {% endif %}
+    {% if perms.administracion.can_aprobar_informes %}
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:aprobacion_informe' %}">
+            <i class="fa fa-inbox dash-icon"></i>
+            <div class="dash-label"><h4>Aprobación de informes</h4></div>
+        </a>
+    </div>
+    {% endif %}
+    </div>
+
+    {% if perms.administracion.can_ingresar_muestras_programas_clinicos %}
+    <div class="row">
+    <h3>Atención a las Personas</h3>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" data-toggle="modal" data-target="#preliminar"">
+            <i class="fa fa-user-md dash-icon"></i>
+            <div class="dash-label"><h4>Clínico</h4></div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:nueva_muestra_citohistopatologia' %}">
+            <i class="fa fa-venus dash-icon"></i>
+            <div class="dash-label"><h4>Citohistopatología</h4></div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:nueva_muestra_banco_sangre' %}">
+            <i class="fa fa-tint dash-icon"></i>
+            <div class="dash-label"><h4>Banco de Sangre</h4></div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:nueva_muestra_eedd' %}">
+            <i class="fa fa-search dash-icon"></i>
+            <div class="dash-label"><h4>Evaluación Externa de Desempeño Directo</h4></div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:nueva_muestra_eeid' %}">
+            <i class="fa fa-list-alt dash-icon"></i>
+            <div class="dash-label"><h4>Evaluación Externa de Desempeño Indirecto</h4></div>
+        </a>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if perms.administracion.can_ingresar_muestras_programas_ambientes %}
+    <div class="row">
+    <h3>Unidad de Vigilancia de Factores de Riesgo del Ambiente Y del Consumo Humano</h3>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:nueva_muestra_agua' %}">
+            <img src="/static/font-awesome/pluma.svg" width="30" height="30" color="red" class="dash-icon">
+            <div class="dash-label"><h4>Aguas</h4></div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'alimentos:nueva_muestra' %}">
+            <i class="fa fa-shopping-basket dash-icon"></i>
+            <div class="dash-label"><h4>Alimentos</h4></div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'bebidas_alcoholicas:nueva_muestra' %}">
+            <i class="fa fa-beer dash-icon"></i>
+            <div class="dash-label"><h4>Bebidas Alcohólicas</h4></div>
+        </a>
+    </div>  
+     <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'trazabilidad:nueva_muestra_entomologia' %}">
+            <img src="/static/font-awesome/mosquito.svg" width="60" height="60" color="red" class="dash-icon">
+            <div class="dash-label"><h4>Entomología</h4></div>
+        </a>
+    </div>      
+    </div>
+    {% endif %}
+
+    {% if es_superusuario %}
+    <div class="row">
+    <h3>Gestión de Documentos</h3>
+    <div class="col-md-3">
+        <a class="thumbnail text-center" href="{% url 'equipos:control_temperatura' %}">
+            <i class="fa fa-inbox dash-icon"></i>
+            <div class="dash-label"><h4>Control de Temperatura</h4></div>
+        </a>
+    </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+
+
+    <div id="preliminar" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Seleccione la acción a ejecutar</h4>
+            </div>
+            <div class="modal-body">
+                <h3>Clínico</h3>
+                <a href="{% url 'trazabilidad:nueva_muestra_clinica' %}"><h4>Clínico</h4></a>
+                <br>
+                <h3>Programa Covid-19</h3>
+                <a href="{% url 'covid19:nueva_muestra_346' %}"><h4>Formulario 346</h4></a>
+                <a href="{% url 'covid19:nueva_muestra_348' %}"><h4>Formulario 348</h4></a>
+                {% if perms.administracion.can_consultar_resultados_covid %}
+                <a href="{% url 'covid19:consulta_resultados' %}"><h4>Consulta de resultados</h4></a>
+                {% endif %}
+                {% switch "consulta-resultados" %}
+                {% if perms.administracion.can_mail_resultados_covid %}
+                <a href="{% url 'covid19:envio_masivo_resultados_mail' %}"><h4>Envio masivo de resultados</h4></a>
+                {% endif %}
+                {% endswitch %}
+                {% if perms.administracion.can_exportar_ficha_excel %}
+                <a href="{% url 'covid19:exportacion_excel_ficha' %}"><h4>Exportación a excel de fichas</h4></a>
+                {% endif %}
+                {% switch "impresion-lote" %}
+                {% if perms.administracion.can_imprimir_lote_fichas_covid %}
+                <a href="{% url 'covid19:impresion_lote_fichas' %}"><h4>Impresión en lote de fichas y resultados</h4></a>
+                {% endif %}
+                {% endswitch %}
+                <a href="{% url 'trazabilidad:nueva_muestra_eedd' %}"><h4>Evaluación de Desempeño Directa</h4></a>
+                <a href="{% url 'trazabilidad:nueva_muestra_eeid' %}"><h4>Evaluación de Desempeño Indirecta</h4></a>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+    <h4>LUGAR DE RECOLECCIÓN</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>DEPARTAMENTO</th>
+            <td>{{ poblado.municipio.departamento }}</td>
+        </tr>
+        <tr>
+            <th>MUNICIPIO</th>
+            <td>{{ poblado.municipio }}</td>
+        </tr>
+        <tr>
+            <th>POBLADO</th>
+            <td>{{ poblado }}</td>
+        </tr>
+    </table>
+
+    <h4>DATOS DE LA EPSA</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>NOMBRE EPSA</th>
+            <td>{{ poblado.epsa.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>DIRECCIÓN</th>
+            <td>{{ poblado.epsa.direccion|upper }}</td>
+        </tr>
+        <tr>
+            <th>TIPO DE EPSA</th>
+            <td>{{ poblado.epsa.get_tipo_display|upper }}</td>
+        </tr>
+        <tr>
+            <th>NO. RUP</th>
+            <td>{{ poblado.epsa.rup }}</td>
+        </tr>
+        <tr>
+            <th>NO. NIT</th>
+            <td>{{ poblado.epsa.nit }}</td>
+        </tr>
+    </table>
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'trazabilidad:estado_muestra_agua' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'trazabilidad:actualizar_muestra_agua' ingreso.id %}{% endblock %}

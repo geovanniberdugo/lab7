@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block heading %}Lugar Recolección{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/jquery.bootgrid.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-primary pull-right" href="{% url 'administracion:nuevo_lugar_recoleccion' %}">Agregar Lugar Recolección</a>
+    </div>
+    </div>
+    <br>
+
+    <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+        <tr>
+            <th data-column-id="id" data-identifier="true" data-visible="false"></th>
+            <th data-column-id="nombre">Nombre</th>
+            <th data-column-id="municipio">Municipio</th>
+            <th data-column-id="departamento">Departamento</th>
+            <th data-column-id="modificacion">Ultima modificación</th>
+            <th data-column-id="modificado">Modificado por</th>
+            <th data-column-id="commands" data-formatter="commands" data-sortable="false">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for lugar in lugarrecoleccion_list %}
+            <tr>
+            <td>{{ lugar.id }}</td>
+            <td>{{ lugar.nombre|title }}</td>
+            <td>{{ lugar.municipio|title }}</td>
+            <td>{{ lugar.municipio.departamento.nombre|title}}</td>
+            <td>{{ lugar.ultima_modificacion }}</td>
+            <td>{{ lugar.modificado_por|title }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/jquery.bootgrid.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tables.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        tabla('{% url 'administracion:actualizar_lugar_recoleccion' 0 %}');
+    })
+</script>
+{% endblock %}

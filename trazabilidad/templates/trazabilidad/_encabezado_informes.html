@@ -1,0 +1,23 @@
+{% load static %}
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <tr>
+            <td class="text-center td-percent" id="img-encabezado">
+                <img class="img-header" src="{{ dominio }}{% static 'img/escudo_gobernacion.png' %}">
+            </td>
+            <td class="text-center header-print">
+                LABORATORIO DE SALUD PUBLICA<br>
+                DEPARTAMENTO DEL ATLANTICO<br>
+
+                <small class="header-break base-text">
+                    <p>Calle 75 # 72 - 140</p>
+                    <p>Teléfono: 3307000</p>
+                    <p>www.atlantico.gov.co</p>
+                    <p>laboratorio@atlantico.gov.co</p>
+                </small>
+
+                <small>{{ titulo|upper }}</small>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,77 @@
+{% extends 'trazabilidad/informe_gerencial_base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block form %}
+<div class="row hidden-print">
+    <div class="col-md-2">{{ form.fecha_inicial|as_crispy_field }}</div>
+    <div class="col-md-2">{{ form.fecha_final|as_crispy_field }}</div>
+</div>
+{% endblock form %}
+
+{% block resultados %}
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-center">Recepcionista</th>
+            <th>Frecuencia</th>
+            <th>Porcentaje</th>
+            <th>% Acumulado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in info %}
+        <tr class="parent">
+            <td class="text-center open"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></td>
+            <td>{{ i.resultado|capfirst }}</td>
+            <td>{{ i.frecuencia }}</td>
+            <td>{{ i.porcentaje|floatformat }}</td>
+            <td>{{ i.acumulado|floatformat }}</td>
+        </tr>
+        <tr class="child hidden">
+            <td colspan="5">
+                <table class="table">
+                    <tr>
+                        <th>Radicado</th>
+                        <th>Recepción</th>
+                        <th>Solicitante</th>
+                    </tr>
+                    {% for ingreso in i.detalle %}
+                    <tr>
+                        <td>{{ ingreso.radicado }}</td>
+                        <td>{{ ingreso.fecha_recepcion|date:"Y/m/d"}} {{ ingreso.fecha_recepcion|time:"H:i" }}</td>
+                        <td>{{ ingreso.solicitante }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">
+                No hay Datos
+            </td>
+        </tr>
+        {% endfor %}
+        {% if info %}
+        <tr>
+            <td></td>
+            <th>Total</th>
+            <td>{{ total }}</td>
+            <td>100</td>
+            <td>--</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+<canvas id="piechart_3d" width="100%" height="50"></canvas>
+{% endblock resultados %}
+
+{% block js %}
+{{ block.super }}
+<script>
+    $('#id_fecha_inicial, #id_fecha_final').datetimepicker({
+        format: 'YYYY-MM-DD',
+    });
+</script>
+{% endblock js %}

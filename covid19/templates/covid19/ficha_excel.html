@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block title %}Exportación a excel de fichas{% endblock %}
+
+{% block css %}
+<style>
+    form .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block heading %}EXPORTACION A EXCEL DE FICHAS{% endblock %}
+
+{% block content %}
+    {% include 'components/messages-alert.html' %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3">{{ form.fecha_inicial|as_crispy_field }}</div>
+            <div class="col-md-3">{{ form.fecha_final|as_crispy_field }}</div>
+            <div class="col-md-3"><button class="btn btn-primary">Exportar</button></div>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'js/moment.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/es.js"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.dateinput').datetimepicker({
+            format: 'YYYY-MM-DD'
+        });
+
+        $("#id_fecha_inicial").on("dp.change", function (e) {
+            $('#id_fecha_final').data("DateTimePicker").minDate(e.date);
+        });
+        $("#id_fecha_final").on("dp.change", function (e) {
+            $('#id_fecha_inicial').data("DateTimePicker").maxDate(e.date);
+        });
+    });
+</script>
+{% endblock js %}

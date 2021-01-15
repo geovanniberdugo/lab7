@@ -1,0 +1,730 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags tz %}
+
+{% block css %}
+<!-- <link rel="stylesheet" href="{% static 'css/informes2.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/_informe_nuevo_grande.css' %}">
+{% endblock %}
+
+{% block heading %}
+    {% include 'trazabilidad/_encabezado_informes.html' with titulo='informe de resultados parcial' %}
+{% endblock %}
+
+{% block content %}
+{% if imprimir %}
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="col-xs-1">
+            <button type="submit" name="imprimir" class="btn btn-default btn-sm hidden-print">
+                <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+            </button>
+        </div>
+    </form>
+    <div class="hidden-print"><br></div>
+{% endif %}
+
+    <div>
+        <h3 id="num-radicado-" class="pull-right radicado-print">RADICADO NO. {{ ingreso.radicado }}</h3>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <th>FECHA DEL INFORME</th>
+            <td>{% if informe.fecha %}{{ informe.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}{% else %}{{fecha_impresion|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper}}{% endif %}</td>
+        </tr>
+    </table>
+
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            <h4 class="header-print">DATOS GENERALES</h4>
+            <table class="table table-bordered margin-print">
+                <tr>
+                    <th class="wd-13">Nº DE RADICACION</th>
+                    <td>{{ ingreso.radicado }}</td>
+                    <th class="wd-13">FECHA DE RECIBO</th>
+                    <td>{{ ingreso.fecha_recepcion|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+                    <th class="wd-11">FECHA DE PROCESO</th>
+                    <td>{{ ingreso.fecha_radicado|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    {% if ingreso.programa.codigo == 'aguas' %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td class="wd-4">AGUAS</td>
+                    {% elif ingreso.programa.codigo == 'alimentos' %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td class="wd-4">ALIMENTOS</td>
+                    {% elif ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td class="wd-4">BEBIDAS ALCOHÓLICAS</td>
+                    {% else %}
+                    <th class="wd-13">TIPO DE MUESTRA</th>
+                    <td>{% if ingreso.tipo == 'clinica' %}{% for m in muestra.tipo_muestras.all %}{% if forloop.first %}{{ m }}{% else %}, {{ m }} {% endif %}{% endfor %}{% else %}{{ muestra.tipo_muestra|upper }}{% endif %}</td>
+                    {% endif %}
+                    <th class="wd-15">AREA</th>
+                    <td>{% for area in ingreso.areas %}{% if forloop.first %}{{ area|upper }}{% else %}, {{ area|upper }}{% endif %}{% endfor %}</td>
+                </tr>
+            </table>
+            {% if ingreso.programa.codigo == 'covid19' %}
+            {% include 'covid19/_datos_generales_informe_resultados.html' with muestra=muestra %}
+            {% endif %}
+            {% if ingreso.programa.codigo == 'banco_sangre' or ingreso.programa.codigo == 'citohistopatologia' %}
+            <table class="table table-bordered margin-tables-print">
+                {% if ingreso.programa.codigo == 'banco_sangre' %}
+                <tr>
+                    <th class="wd-10">TIPO DE ENVASE</th>
+                    <td>{{ muestra.tipo_envase|upper }}</td>
+                </tr>
+                {% elif ingreso.programa.codigo == 'citohistopatologia' %}
+                <tr>
+                    <th class="wd-8">CONTROL</th>
+                    <td>{{ muestra.control|upper }}</td>
+                    <th class="wd-10">TIPO DE EVENTO</th>
+                    <td>{{ muestra.tipo_evento|upper }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            {% endif %}
+            {% if ingreso.programa.codigo == 'clinica' or ingreso.programa.codigo == 'banco_sangre' or ingreso.programa.codigo == 'citohistopatologia' %}
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    <th class="wd-8">NOMBRES</th>
+                    <td>{{ muestra.paciente.nombre|upper }}</td>
+                    <th class="wd-8">APELLIDOS</th>
+                    <td>{{ muestra.paciente.apellido|upper }}</td>
+                    <th class="wd-10">DOCUMENTO ID</th>
+                    <td>{{ muestra.paciente.tipo_identificacion|upper }} {{ muestra.paciente.identificacion }}</td>
+                    <th class="wd-8">EDAD</th>
+                    <td>{{ muestra.paciente.edad }} {{ muestra.paciente.get_tipo_edad_display|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    <th class="wd-8">SEXO</th>
+                    {% if muestra.paciente.sexo == 'M' %}
+                    <td class="wd-8">MASCULINO</td>
+                    {% else %}
+                    <td class="wd-8">FEMENINO</td>
+                    {% endif %}
+                    {% if ingreso.programa.codigo == 'clinica' %}
+                        {% if muestra.paciente.sexo == 'F' %}
+                            <th class="wd-8">EMBARAZADA</th>
+                            <td class="wd-7">{% if muestra.clinica.embarazada == True %}Si{% else %}No{% endif %}</td>
+                        {% endif %}
+                    {% endif %}
+                    <th class="wd-8">DIRECCION</th>
+                    <td>{{ muestra.paciente.direccion|upper }}</td>
+                    <th class="wd-8">EPS-PLAN</th>
+                    <td>{{ muestra.paciente.eps.nombre|upper }}</td>
+                </tr>
+            </table>
+            {% elif ingreso.programa.codigo == 'entomologia' %}
+                <table class="table table-bordered margin-tables-print margin-tables-print-plus">
+                    <tr>
+                        <th class="wd-8">NOMBRES</th>
+                        <td>{{ muestra.responsable_recoleccion.nombres|upper }}</td>
+                        <th class="wd-8">APELLIDOS</th>
+                        <td>{{ muestra.responsable_recoleccion.apellidos|upper }}</td>
+                        <th class="wd-10">TIPO DE VIGILANCIA</th>
+                        <td>{{ muestra.tipo_vigilancia|upper }}</td>
+                        <th class="wd-10">ESTADO DE DESARROLLO</th>
+                        <td>{{ muestra.get_estado_desarrollo_display|upper }}</td>
+                    </tr>
+                </table>
+            {% elif ingreso.programa.codigo == 'eedd' or ingreso.programa.codigo == 'eeid' %}
+                <table class="table table-bordered margin-tables-print-plus">
+                    <tr>
+                        <th class="wd-10">INSTITUCIÓN</th>
+                        <td>{{ muestra.institucion.nombre|upper }}</td>
+                        {% if ingreso.tipo == 'evaluacion externa desempeño indirecto' %}
+                            <th class="wd-8">CÓDIGO</th>
+                            <td>{{ muestra.institucion.codigo|upper }}</td>
+                        {% endif %}
+                        <th class="wd-10">DIRECCIÓN</th>
+                        <td>{{ muestra.institucion.direccion|upper  }}</td>
+                        <th class="wd-8">Nº NIT</th>
+                        <td>{{ muestra.institucion.nit|upper  }}</td>
+                        <th class="wd-10">DEPARTAMENTO</th>
+                        <td>{{ muestra.institucion.municipio.departamento|upper  }}</td>
+                        <th class="wd-10">MUNICIPIO</th>
+                        <td>{{ muestra.institucion.municipio.nombre|upper  }}</td>
+                    </tr>
+                </table>
+            {% else %}
+                {% if ingreso.programa.codigo == 'aguas' %}
+                    {% with info=muestra.informacion_general  %}
+                        <table class="table table-bordered" style="margin-top: -21px">
+                            <tr>
+                                <th class="wd-10">DEPARTAMENTO</th>
+                                <td>{{ info.poblado.municipio.departamento|upper }}</td>
+                                <th class="wd-10">MUNICIPIO</th>
+                                <td>{{ info.poblado.municipio|upper }}</td>
+                                <th class="wd-8">POBLADO</th>
+                                <td>{{ info.poblado|upper }}</td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered" style="margin-top: -21px">
+                            <tr>
+                                <th class="wd-4">EPSA</th>
+                                <td>{{ info.poblado.epsa.nombre|upper }}</td>
+                                <th class="wd-8">DIRECCION</th>
+                                <td>{{ info.poblado.epsa.direccion|upper }}</td>
+                                <th class="wd-4">NIT</th>
+                                <td>{{ info.poblado.epsa.nit|upper }}</td>
+                            </tr>
+                        </table>
+                    {% endwith %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    {% if ingreso.programa.codigo == 'covid19' %}
+    {% include 'covid19/_datos_extras_informe_resultados.html' with muestra=muestra %}
+    {% endif %}
+
+    {% if ingreso.programa.codigo == 'clinica' %}
+        <div class="row table-responsive">
+            <div class="col-md-12 panel-print">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="header-print">LUGAR DE PROCEDENCIA / OCURRENCIA</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="wd-15">DEPARTAMENTO</th>
+                                <td>{{ muestra.clinica.municipio.departamento.nombre|upper }}</td>
+                                <th class="wd-15">MUNICIPIO</th>
+                                <td>{{ muestra.clinica.municipio.nombre|upper }}</td>
+                                <th class="wd-15">BARRIO</th>
+                                <td>{{ muestra.clinica.barrio|upper }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+    {% if ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="header-print">INFORMACIÓN SOLICITANTE</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="">
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="wd-15" lenght="11">INSTITUCIÓN SOLICITANTE</th>
+                        <td>{{ muestra.informacion_general.institucion.nombre|upper }}</td>
+                        <th class="wd-15" lenght="11">DIRECCIÓN SOLICITANTE</th>
+                        <td>{{ muestra.informacion_general.institucion.direccion|upper }}</td>
+                        <th class="wd-30">RESPONSABLE DE TOMA</th>
+                        <td>{{ muestra.informacion_general.responsable_entrega|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="wd-15">CARGO</th>
+                        <td>{{ muestra.informacion_general.cargo|upper }}</td>
+                        <th class="wd-15" lenght="11">NÚMERO DE CASO</th>
+                        <td>{{ muestra.informacion_general.numero_caso|upper }}</td>
+                        <th class="wd-30">NÚMERO DE OFICIO</th>
+                        <td>{{ muestra.informacion_general.numero_oficio|upper }}</td>
+                        <th class="wd-15">PROPIETARIO</th>
+                        <td>{{ muestra.informacion_general.propietario|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not ingreso.programa.codigo == 'covid19' %}
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            {% if ingreso.tipo == 'evaluacion externa desempeño directo' or ingreso.tipo == 'evaluacion externa desempeño indirecto' %}
+            <!--Pass-->
+            {% elif ingreso.tipo == 'agua' %}
+            <!--Pass-->
+            {% else %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="header-print">LUGAR DE RECOLECCIÓN</h4>
+                    </div>
+                </div>
+            {% endif %}
+            {% if ingreso.tipo == 'entomologia' %}
+                <table class="table table-bordered panel-print">
+                    <tr>
+                        <th class="wd-15">DEPARTAMENTO</th>
+                        <td>{{ muestra.lugar_recoleccion.municipio.departamento|upper }}</td>
+                        <th class="wd-15">MUNICIPIO</th>
+                        <td>{{ muestra.lugar_recoleccion.municipio|upper }}</td>
+                        <th class="wd-15">LUGAR DE RECOLECCIÓN</th>
+                        <td>{{ muestra.lugar_recoleccion.nombre|upper }}</td>
+                    </tr>
+                </table>
+            {% elif ingreso.tipo == 'evaluacion externa desempeño directo' or ingreso.tipo == 'evaluacion externa desempeño indirecto' %}
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="wd-15">CONTROL</th>
+                        <td>{{ muestra.control|upper }}</td>
+                        <th class="wd-15">TIPO DE EVENTO</th>
+                        <td>{{ muestra.tipo_evento|upper }}</td>
+                        <th class="wd-15">TIPO DE MUESTRA</th>
+                        <td>{{ muestra.tipo_muestra|upper }}</td>
+                    </tr>
+                </table>
+                {% if ingreso.tipo == 'evaluacion externa desempeño indirecto' %}
+                    <table class="table table-bordered">
+                        <tr>
+                            <th class="wd-15">PROGRAMADO</th>
+                            <td>{{ muestra.get_programado_display|upper }}</td>
+                            <th class="wd-15">PROGRAMA</th>
+                            <td>{{ muestra.programa|upper }}</td>
+                        </tr>
+                    </table>
+                {% endif %}
+            {% elif ingreso.tipo == 'agua' %}
+                {% with info=muestra.informacion_general  %}
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>FECHA DE RECOLECCION</th>
+                            <td>{{ info.fecha_recoleccion|date:"j \d\e F \d\e Y"|upper }}</td>
+                            <th>SOLICITANTE</th>
+                            <td>{{ info.solicitante|upper }}</td>
+                            <th>RESPONSABLE DE LA TOMA</th>
+                            <td>{{ info.responsable_toma|upper }}</td>
+                            <th>COD. DEL PUNTO</th>
+                            <td>{{ muestra.codigo_punto|upper }}</td>
+                        </tr>
+                        <tr>
+                            <th>HORA DE LA TOMA</th>
+                            <td>{{ muestra.hora_toma|upper }}</td>
+                            <th>TIPO DE AGUA</th>
+                            <td>{{ info.tipo_agua|upper }}</td>
+                            <th>TEMPERATURA</th>
+                            <td>{{ info.temperatura|upper }}</td>
+                            <th>CONCERTADO</th>
+                            {% if muestra.concertado == True %}
+                                <td>SI</td>
+                            {% elif muestra.concertado == False %}
+                                <td>NO</td>
+                            {% else %}
+                                <td>{{ muestra.concertado|upper }}</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                {% endwith %}
+            {% elif ingreso.programa.codigo == 'alimentos' %}
+                {% with info=muestra.informacion_general  %}
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>DEPARTAMENTO</th>
+                            <td>{{ info.poblado.municipio.departamento|upper }}</td>
+                            <th>MUNICIPIO</th>
+                            <td>{{ info.poblado.municipio|upper }}</td>
+                            <th>POBLADO</th>
+                            <td>{{ info.poblado|upper }}</td>
+                        </tr>
+                        <tr>
+                            <th>PUNTO DE LA TOMA</th>
+                            <td>{{ info.sitio_toma|upper }}</td>
+                            <th>DIRECCION</th>
+                            <td>{{ info.direccion_recoleccion|upper }}</td>
+                            <th>FECHA</th>
+                            <td>{{ info.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+                        </tr>
+                    </table>
+                {% endwith %}
+            {% elif ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                {% with info=muestra.informacion_general  %}
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>DEPARTAMENTO</th>
+                            <td>{{ info.poblado.municipio.departamento|upper }}</td>
+                            <th>MUNICIPIO</th>
+                            <td>{{ info.poblado.municipio|upper }}</td>
+                            <th>POBLADO</th>
+                            <td>{{ info.poblado|upper }}</td>
+                        </tr>
+                        <tr>
+                            <th>SITIO DE LA TOMA</th>
+                            <td>{{ info.sitio_toma|upper }}</td>
+                            <th>DIRECCION</th>
+                            <td>{{ info.direccion|upper }}</td>
+                            <th>FECHA</th>
+                            <td>{{ info.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+                        </tr>
+                    </table>
+                {% endwith %}
+            {% else %}
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="wd-30">INSTITUCIÓN</th>
+                        <td>{{ muestra.institucion.nombre|upper }}</td>
+                        <th class="wd-30">DEPARTAMENTO</th>
+                        <td>{{ muestra.institucion.municipio.departamento|upper }}</td>
+                        <th class="wd-30">MUNICIPIO</th>
+                        <td>{{ muestra.institucion.municipio|upper }}</td>
+                    </tr>
+                </table>
+            {% endif %}
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    <th class="wd-35">PROPÓSITO GÉNERAL DE LA PRUEBA</th>
+                    <td>{{ informe.objeto|striptags|upper }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if ingreso.programa.codigo == 'alimentos' %}
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="header-print">ENTIDAD SOLICITANTE</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="">
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="wd-15" lenght="11">SOLICITANTE</th>
+                        <td>{{ muestra.informacion_general.solicitante.nombre|upper }}</td>
+                        <th class="wd-30">RESPONSABLE DEL MUESTREO</th>
+                        <td>{{ muestra.informacion_general.responsable|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>DIRECCIÓN SOLICITANTE</th>
+                        <td>{{ muestra.informacion_general.direccion|upper }}</td>
+                        <th>CARGO</th>
+                        <td>{{ muestra.informacion_general.cargo|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="header-print">DETALLE MUESTRA</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="">
+                <table class="table table-bordered">
+                    <tr>
+                        <th >N. UNIDAD MUESTRA</th>
+                        <td>{{ muestra.unidad_muestra }}</td>
+                        <th>CONTENIDO NETO U/M</th>
+                        <td>{{ muestra.contenido_neto|upper }}</td>
+                        <th>N. UNIDAD CONTRAMUESTRA</th>
+                        <td>{{ muestra.unidad_contramuestra }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>DESCRIPCION SEGUN EL ROTULO</th>
+                        <td>{{ muestra.descripcion|upper }}</td>
+                        <th>REGISTRO SANITARIO</th>
+                        <td>{{ muestra.registro_sanitario|upper }}</td>
+                        <th>LOTE/FECHA RECOLECCIÓN</th>
+                        <td>{{ muestra.lote|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>PROPIETARIO</th>
+                        <td>{{ muestra.propietario|upper }}</td>
+                        <th>IMPORTADOR</th>
+                        <td>{{ muestra.importador|upper }}</td>
+                        <th>DIRECCION IMPORTADOR</th>
+                        <td>{{ muestra.direccion_importador|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>FECHA VENCIMIENTO</th>
+                        <td>{% if muestra.ano_vencimiento %}{{ muestra.ano_vencimiento }}{% endif %}{% if muestra.mes_vencimiento %}{% if muestra.ano_vencimiento %}/{% endif %}{{ muestra.mes_vencimiento }}{% endif %}{% if muestra.dia_vencimiento %}{% if muestra.ano_vencimiento or muestra.mes_vencimiento %}/{% endif %}{{ muestra.dia_vencimiento }}{% endif %}</td>
+                        <th>RESPONSABLE ENTREGA</th>
+                        <td>{{ muestra.responsable_entrega|upper }}</td>
+                        <th>FABRICANTE</th>
+                        <td>{{ muestra.fabricante.nombre|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>DISTRIBUIDOR</th>
+                        <td>{{ muestra.distribuidor.nombre|upper }}</td>
+                        <th>TEMPERATURA INGRESO</th>
+                        <td>{{ muestra.temperatura|upper }}</td>
+                        <th>TEMPERATURA EN SITIO DE TOMA</th>
+                        <td>{{ muestra.temperatura_recoleccion|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>CUMPLE</th>
+                        <td>{{ muestra.get_cumple_display|upper }}</td>
+                        <th>CADENA CUSTODIA</th>
+                        <td>{{ muestra.get_cadena_custodia_display|upper }}</td>
+                        <th>CONSTANCIA DE PAGO</th>
+                        <td>{{ muestra.get_constancia_pago_display|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>GRUPO DE ALIMENTO</th>
+                        <td>{{ muestra.tipo.grupo.descripcion|upper }}</td>
+                        <th>TIPO DE ALIMENTO</th>
+                        <td>{{ muestra.tipo.descripcion|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>SUB-CATEGORIA</th>
+                        <td>{{ muestra.subcategoria.descripcion|upper }}</td>
+                        <th>MOTIVO ANALISIS</th>
+                        <td>{{ muestra.motivo_analisis.nombre|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+
+    <div class="row table-responsive">
+        <div class="col-md-12 panel-print">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="header-print">DETALLE MUESTRA</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="">
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>TEMPERATURA</th>
+                        <td>{{ muestra.temperatura|upper }}</td>
+                        <th>GRUPO DE BEBIDA ALCOHÓLICA</th>
+                        <td>{{ muestra.producto.grupo.nombre|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>NOMBRE COMERCIAL</th>
+                        <td>{{ muestra.producto.nombre|upper }}</td>
+                        <th>REGISTRO SANITARIO</th>
+                        <td>{{ muestra.registro_sanitario|upper }}</td>
+                        <th>LOTE</th>
+                        <td>{{ muestra.numero_lote|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+
+                        <th>GRADO ALCOHOLIMÉTRICO</th>
+                        <td>{{ muestra.grado|upper }}</td>
+                        <th>FECHA VENCIMIENTO</th>
+                        <td>{% if not muestra.no_aplica_vencimiento %}{% if muestra.ano_vencimiento %}{{ muestra.ano_vencimiento }}{% endif %}{% if muestra.mes_vencimiento %}{% if muestra.ano_vencimiento %}/{% endif %}{{ muestra.mes_vencimiento }}{% endif %}{% if muestra.dia_vencimiento %}{% if muestra.ano_vencimiento or muestra.mes_vencimiento %}/{% endif %}{{ muestra.dia_vencimiento }}{% endif %}{% else %}NO APLICA VENCIMIENTO{% endif %}</td>
+                        <th>EMPRESA FABRICANTE</th>
+                        <td>{{ muestra.fabricante|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+
+                        <th>DIRECCIÓN FABRICANTE</th>
+                        <td>{{ muestra.direccion_fabricante|upper }}</td>
+                        <th>CONTENIDO DECLARADO</th>
+                        <td>{{ muestra.contenido|upper }}</td>
+                        <th>TIPO DE ENVASE</th>
+                        <td>{{ muestra.tipo_envase.nombre|upper }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered margin-tables-print">
+                    <tr>
+                        <th>ASPECTO INTERNO</th>
+                        <td>{{ muestra.get_aspecto_interno_display|upper }}</td>
+                        <th>ASPECTO EXTERNO</th>
+                        <td>{{ muestra.get_aspecto_externo_display|upper }}</td>
+                        <th>HERMETICIDAD</th>
+                        <td>{{ muestra.get_hermeticidad_display|upper }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-xs-12 panel-print">
+            <h4 class="header-print">EMISIÓN DE RESULTADOS</h4>
+        </div>
+    </div>
+
+    {% if ingreso.programa.codigo == 'aguas' or ingreso.programa.codigo == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+        <div class="row radicado-muestra">
+            <div class="col-xs-12 margin-tables-print">
+                <table class="table table-bordered margin-print">
+                    <tr>
+                        <th colspan="4" class="text-center"><p class="base-text">{{ ingreso.radicado }}-{{ forloop.counter }}</p></th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row table-responsive">
+        <div class="col-xs-12">
+            <table class="table table-striped table-bordered">
+                <colgroup>
+                    <col width="25%">
+                    <col width="25%">
+                    <col width="25%">
+                    <col width="25%">
+                </colgroup>
+                {% with prueba_realizada as p %}
+                <thead>
+                    <tr>
+                        <th colspan="{% if programa == 'aguas' %}5{% elif programa == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' %}{% if not programa == 'alimentos' %}3{% else %}{% if not programa == 'alimentos' %}5{% else %}3{% endif %}{% endif %}{% else %}4{% endif %}">{{ p.prueba.area|upper }}</th>
+                        {% if ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                            <th colspan="2">NORMATIVIDAD: {{ muestra.decreto.nombre|upper }}</th>
+                        {% elif programa == 'alimentos' %}
+                            <th colspan="2">NORMATIVIDAD: {% for decreto in muestra.decretos.all %}{% if decreto.area == grupo.grouper %}{{ decreto|upper }} {% endif %}{% endfor %}</th>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th {% if p.prueba.area.oculto %}colspan="2"{% endif %}>PRUEBA</th>
+                        <th {% if p.prueba.area.oculto %}colspan="3"{% endif %}>RESULTADO</th>
+                        {% if programa == 'aguas' or programa == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                            {% if not p.prueba.area.oculto %}
+                                <th>VALORES DE REFERENCIA</th>
+                            {% endif %}
+                        {% endif %}
+                        {% if not p.prueba.area.oculto %}<th {% if p.prueba.area.oculto %}colspan="2"{% endif %}>MÉTODO UTILIZADO</th>{% endif %}
+                        {% if programa != 'alimentos' and ingreso.programa.codigo != 'bebidas_alcoholicas' and programa != 'aguas' %}
+                        <th>OBJETO DE LA PRUEBA</th>
+                        {% else %}
+                        {% if not p.prueba.area.oculto %}
+                        <th>CONCEPTO ANALISTA</th>
+                        {% endif %}
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td {% if p.0.prueba.area.oculto %}colspan="2"{% endif %}>{{ p.prueba.nombre|upper }}</td>
+                        {% if programa == 'aguas' or programa == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' and not p.prueba.area.oculto %}
+                            <td>{{ p.resultado_numerico }}</td>
+                        {% else %}
+                            <td {% if p.0.prueba.area.oculto %}colspan="3"{% endif %}>{% for re in p.resultados.all %}{% if forloop.first %}{{ re|upper }}{% else %}, {{ re|upper }}{% endif %}{% endfor %}</td>
+                        {% endif %}
+                        {% if programa == 'aguas' or programa == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                            {% if not p.prueba.area.oculto %}
+                            <td>{{ p.prueba.valores_referencia }}</td>
+                            {% endif %}
+                        {% endif %}
+                        {% if not p.prueba.area.oculto %}
+                        <td {% if p.0.prueba.area.oculto %}colspan="2"{% endif %}>{{ p.metodo|upper }}</td>
+                        {% endif %}
+                        {% if programa == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' or programa == 'aguas' %}
+                            {% if not p.prueba.area.oculto %}
+                            <td>{{ p.concepto|upper }}</td>
+                            {% endif %}
+                        {% else %}
+                        <td>{{ p.metodo.objeto|upper }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endwith %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if imprimir %}
+        <br>
+        <div class="row panel-print">
+            <div class="col-xs-4">
+                <hr>
+                <h4 class="page radicado-print" style="text-align: center">ANALISTA</h4>
+            </div>
+            <div class="col-xs-4">
+                <hr>
+                <h4 class="page radicado-print" style="text-align: center">RESPONSABLE TECNICO</h4>
+            </div>
+            <div class="col-xs-4">
+                <hr>
+                <h4 class="page radicado-print" style="text-align: center">APROBÓ</h4>
+            </div>
+        </div>
+        <br>
+        <footer id="footer">
+            <div class="toprint">
+                {% include 'trazabilidad/_piepagina_informes.html' %}
+            </div>
+            <div class="row panel-footer">
+                <div class="text-center">
+                    <img id="img-footer"src="{{dominio}}/static/img/logo_gobernacion.png">
+                </div>
+            </div>
+            <div class="row">
+                <div class="row text-center">
+                    <p class="base-text" id="usuario-imprime">Informe impreso el dia {{ fecha_impresion }} por el usuario: {{ user }}</p>
+                </div>
+            </div>
+        </footer>
+        <div id="end"></div>
+    {% endif %}
+    <br>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+
+    $('#id_estado').change(function(){
+        var valor = $(this).val();
+        if (valor=='R') {
+            $('#div_id_motivo_rechazo').removeClass('hidden');
+        }
+        else {
+            $('#div_id_motivo_rechazo').addClass('hidden');
+        }
+    });
+
+    $('#imprimir').click(function(){
+        window.print();
+        {% if ingreso.confirmada %}
+            document.location.href = "{% url 'trazabilidad:analisis' %}";
+        {% else %}
+            document.location.href = "{% url 'trazabilidad:actualizar_muestra_clinica' ingreso.id %}";
+        {% endif %}
+    });
+
+
+</script>
+{% endblock %}

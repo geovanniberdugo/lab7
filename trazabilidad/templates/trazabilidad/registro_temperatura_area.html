@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block heading %}Registro de Condiciones Ambientales Área{% endblock heading %}
+
+{% block content %}
+    <div class="panel panel-primary">
+    <div class="panel-heading">{{ area|upper }} ({{ area.programa.nombre|upper }}) [{{ area.temperatura_minima }}˚C - {{ area.temperatura_maxima }}˚C][{{ area.humedad_minima }}% - {{ area.humedad_maxima }}%]</div>
+    <div class="panel-body">
+        {% crispy form %}
+        {% csrf_token %}
+    </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript" src="/static/js/funciones_apoyo.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_equipo').on('change', function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#id_codigo').val('');
+            }
+            else {
+                $.getJSON("{% url 'equipos:detalle_equipo_json' 0 %}".replace(0, id), function(response) {
+                    console.log(response);
+                    var equipo = response;
+                    $('#id_codigo').val(equipo.codigo);
+                    $('#id_temperatura_minima').val(equipo.temperatura_minima);
+                    $('#id_temperatura_maxima').val(equipo.temperatura_maxima);
+                });
+            }
+        });
+    });
+    </script>
+{% endblock js %}

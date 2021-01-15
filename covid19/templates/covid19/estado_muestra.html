@@ -1,0 +1,10 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+    {% include 'covid19/_datos_paciente.html' with muestra=muestra_clinica %}
+    {% include 'covid19/_entidad_solicitante_covid.html' with muestra=muestra_clinica %}
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'covid19:estado_muestra' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'covid19:actualizar_muestra' ingreso.id %}{% endblock %}

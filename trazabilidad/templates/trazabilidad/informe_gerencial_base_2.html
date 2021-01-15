@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block content %}
+    <h2 class="text-center">INFORMES GERENCIALES</h2>
+    <h4 class="text-center">{{ titulo }}</h4>
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formularios de Fecha!</strong> {{ form.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_programa.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en los Formularios de Programa y Prueba!</strong> {{ form_programa.errors }}
+        </div>
+    {% endif %}
+
+    {% include 'components/messages-alert.html' %}
+
+    <div class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Parámetros para generar el informe
+            </div>
+            <div class="panel-body">
+                <form action="." method="POST">
+                    {% csrf_token %}
+                    <div class="row hidden-print">
+                        <div class="col-md-3">{{ form.fechai|as_crispy_field }}</div>  
+                        <div class="col-md-3">{{ form.fechaf|as_crispy_field }}</div>
+                        {% block usuarios %}
+                        {% endblock %}                                                        
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block hidden-print">Buscar</button>
+                        </div>
+                        {% if sw %}
+                            <div class="col-md-2">
+                                <a class="btn btn-primary btn-block hidden-print" href={{ enlace }}>Nueva Consulta</a>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-block hidden-print" name="excel">Excel</button>
+                            </div>
+                        {% endif %}          
+                    </div>    
+                </form>
+            </div>      
+        </div>
+    </div>        
+
+    {% if sw %}
+    <div class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Resultados de la Consulta
+            </div>
+            <div class="panel-body">
+                {% block resultados %}
+                {% endblock %}
+                <div class="row">
+                    <div class="col-xs-2">
+                        <button type="button" class="btn btn-default btn-sm hidden-print" id="imprimir">
+                            <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+                        </button>
+                    </div>
+                </div>    
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% block resultados_adicional %}
+    {% endblock %}
+
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="{% static 'js/funciones_apoyo.js' %}"></script>
+    <script src="{% static 'js/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/es.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'js/Chart.js' %}"></script>
+    <script src="{% static 'js/chart_functions.js' %}"></script>
+    <script type="text/javascript">
+        {% if sw %}
+            d = {{grafico|safe}};
+            color = ['#36C','#36C','#36C','#36C','#36C','#36C','#36C','#36C','#36C','#36C','#36C']
+            drawChart($('#piechart_3d'), d, 'bar', color);
+        {% endif %}
+    $(document).ready(function(){
+        $('#id_fechai,#id_fechaf').datetimepicker({
+            format:'YYYY-MM-DD'
+        });
+
+        $('.parent .open').click(function(){
+            var extra = $(this).parent().next('.child');
+            if (extra.hasClass('hidden')) {
+                extra.removeClass('hidden');
+            }
+            else {
+                extra.addClass('hidden');
+            }
+        });
+
+        $('#imprimir').click(function(){
+            window.print();
+            // document.location.href = "{% url 'trazabilidad:tipo_resultado' %}";
+        });
+
+        $('#id_programa').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                llenar_select('#id_prueba', []);
+            }
+            else {
+                $.getJSON("{% url 'trazabilidad:lista_pruebas_programa_json' 0 %}".replace(0, id), function(response){
+                    console.log(response);
+                    llenar_select('#id_prueba', response);
+                });
+            }
+        });
+    });    
+    </script>
+{% endblock %}

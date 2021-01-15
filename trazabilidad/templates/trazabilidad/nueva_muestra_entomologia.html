@@ -1,0 +1,181 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block tipo_muestra_heading %}De Entomologia{% endblock %}
+
+{% block form_errors %}
+    {% if form_responsable.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Responsable de Recolección!</strong> {{ form_responsable.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_lugar.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Lugar de Recolección!</strong> {{ form_lugar.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_muestra.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Muestra de Entomologia!</strong> {{ form_muestra.errors }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_action %}
+    {% if muestra_nueva %}
+        {% url 'trazabilidad:nueva_muestra_entomologia' %}
+    {% else %}
+        {% url 'trazabilidad:actualizar_muestra_entomologia' form_ingreso.instance.pk %}
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo_form %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i>Responsable de Recolección
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="{{ form_responsable.responsable_recoleccion.css_classes }}">
+                        <label class="control-label" for="id_responsable_recoleccion">Responsable de recolección:</label>
+                        {{ form_responsable.responsable_recoleccion }}
+                    </p>
+                </div>
+            </div>
+
+            <div id="responsable_recoleccion_nuevo" {% if form_responsable.instance.pk %}class="hidden"{% endif %} >
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_responsable.nombres.css_classes }}">
+                            <label class="control-label" for="id_nombres">Nombres:</label>
+                            {{ form_responsable.nombres }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p class="{{ form_responsable.apellidos.css_classes }}">
+                            <label class="control-label" for="id_apellidos">Apellidos:</label>
+                            {{ form_responsable.apellidos }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i>Lugar de Recolección
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="{{ form_lugar.lugar_recoleccion.css_classes }}">
+                        <label class="control-label" for="id_lugar_recoleccion">Lugar de recolección:</label>
+                        {{ form_lugar.lugar_recoleccion }}
+                    </p>
+                </div>
+            </div>
+
+            <div id="lugar_recoleccion_nuevo" {% if form_lugar.instance.pk %}class="hidden"{% endif %} >
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_lugar.departamento.css_classes }}">
+                            <label class="control-label" for="id_departamento">Departamento:</label>
+                            {{ form_lugar.departamento }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p class="{{ form_lugar.municipio.css_classes }}">
+                            <label class="control-label" for="id_municipio">Municipio:</label>
+                            {{ form_lugar.municipio }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="{{ form_lugar.nombre.css_classes }}">
+                            <label class="control-label" for="id_nombre">Nombre:</label>
+                            {{ form_lugar.nombre }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i>Muestra de Entomologia
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_muestra.tipo_vigilancia|as_crispy_field }}
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_muestra.estado_desarrollo|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_muestra.tipo_muestra|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_muestra.temp_ingreso|as_crispy_field }}
+                </div>
+            </div>
+
+            {% block form_pruebas %}
+                {{ block.super }}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_lugar-lugar_recoleccion').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#lugar_recoleccion_nuevo').removeClass('hidden');
+            }
+            else {
+                $('#lugar_recoleccion_nuevo').addClass('hidden');
+            }
+        });
+
+        $('#id_responsable-responsable_recoleccion').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#responsable_recoleccion_nuevo').removeClass('hidden');
+            }
+            else {
+                $('#responsable_recoleccion_nuevo').addClass('hidden');
+            }
+        });
+
+        //Llenando el municipio según el departamento
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_lugar-departamento', '#id_lugar-municipio');
+    });
+    </script>
+{% endblock %}

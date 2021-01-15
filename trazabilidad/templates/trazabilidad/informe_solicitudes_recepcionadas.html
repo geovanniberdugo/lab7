@@ -1,0 +1,85 @@
+{% extends 'trazabilidad/informe_gerencial_base_2.html' %}
+{% load static %}
+{% block usuarios %}
+    {% if titulo == "ESTADISTICO DE INFORMES DE RESULTADOS EMITIDOS" %}
+        <div class="col-md-3">
+            <p class="hidden-print {{ form_usuario.usuario.css_classes }}"><label for="id_usuario">Nombre de Usuario:</label> {{form_usuario.usuario}}</p>                 
+        </div>
+    {% endif %} 
+{% endblock usuarios %} 
+
+{% block resultados %}
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col-md-5">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                      <th></th>  
+                      <th class="text-center">{% if ingresos_parciales %}Recepcionista{% else %}Area{% endif %}</th>
+                      <th>Frecuencia</th>
+                      <th>Porcentaje</th>
+                      <th>% Acumulado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in lista %}
+                        <tr class="parent">
+                            <td class="text-center open"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></td>
+                            <td class="text-center">{{p.resultado|capfirst}}</td>
+                            <td class="text-center">{{p.frecuencia}}</td>
+                            <td class="text-center">{{p.porcentaje|floatformat}}</td>
+                            <td class="text-center">{{p.acumulado|floatformat}}</td>
+                        </tr>
+                        <tr class="child hidden">
+                            <td colspan="5">
+                                <table class="table">
+                                    <tr>
+                                        <th>Radicado</th>
+                                        <th>Recepción</th>
+                                        <th>Solicitante</th>
+                                        {% if p.resultado == 'Aguas' %}
+                                            <th>Corresponde</th>
+                                        {% endif %}
+                                    </tr>
+                                    {% for x in p.detalle %}
+                                        <tr>
+                                            <td>{{ x.radicado }}</td>
+                                            <td>{{ x.fecha_recepcion|date:"Y/m/d"}} {{ x.fecha_recepcion|time:"H:i" }}</td>
+                                            <td>{{ x.solicitante }}</td>
+                                            {% if p.resultado == 'Aguas' %}
+                                                <td>{{x.nombre|capfirst}}</td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                No hay Datos
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% if lista %}
+                        <tr>
+                            <td></td>
+                            <th class="text-center">Total</th>
+                            <td class="text-center">{{total}}</td>
+                            <td class="text-center">100</td>
+                            <td class="text-center">--</td>
+                        </tr>
+                    {% endif %}                     
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-12">
+            <canvas id="piechart_3d" width="100%" height="50"></canvas>
+        </div>                
+    </div>   
+{% endblock resultados %}

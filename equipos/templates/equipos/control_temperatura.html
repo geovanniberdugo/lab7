@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load utils %}
+
+{% block heading %}Control de Temperatura Equipos{% endblock heading %}
+
+{% block content %}
+    {% if messages %}
+        {% for message in messages  %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="panel panel-primary">
+    <div class="panel-heading">Escoja un equipo</div>
+    <div class="panel-body">
+        {% crispy form %}
+    </div>
+    </div>
+    <div class="panel panel-primary">
+    <div class="panel-heading">Temperaturas registradas</div>
+    <div class="panel-body">
+
+    {% if equipo != None %}
+        {% if request.user|pertenece_grupo:"analista" or request.user|pertenece_grupo:"super usuario" %}
+        <div class="row">
+            
+            <div class="col-md-12 hidden-print">
+                <button type="button" class="btn btn-primary pull-right" id="imprimir">
+                    <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+                </button>
+                <a class="btn btn-primary pull-right" href="{% url 'equipos:registro_temperatura_equipo' equipo.id %}">Agregar Temperatura</a>
+            </div>
+        </div>
+        <br>
+        {% endif %}
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Fecha de registro</th>
+            <th>Lectura de temperatura</th>
+            <th>Unidad</th>
+            <th>Observaciones</th>
+            <th>Registrado por</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for registro in registros %}
+            <tr {% if registro.alerta %}style="background-color:rgba(255,0,0,.7);color:white;"{% endif %}>
+            <td>{{ registro.fecha_registro }}</td>
+            <td>{{ registro.temperatura|floatformat:2 }}</td>
+            <td>{{ registro.get_unidad_display|title }}</td>
+            <td>{{ registro.observaciones|capfirst }}</td>
+            <td>{{ registro.registrado_por|title }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+            <td colspan="6" class="text-center">
+                {% if equipo == None %}
+                    Por favor seleccione un equipo
+                {% else %}
+                    No hay lecturas de temperatura registradas
+                {% endif %}
+            </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    </div>
+
+    </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">Gráfico de temperatura</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="chart_div"></div>
+                </div>
+                <div class="col-md-12">
+                    <canvas id="piechart_3d" width="100%" height="30"></canvas>
+                </div>
+            </div>
+        </div>        
+    </div>
+    
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="{% static 'js/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/es.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/funciones_apoyo.js' %}"></script>
+    <script src="{% static 'js/Chart.js' %}"></script>
+    <script src="{% static 'js/chart_functions.js' %}"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+
+        // Llenando los equipos según el área
+        llenar_select_hijo_segun_padre("{% url 'equipos:lista_equipos_area_json' 0 %}", '#id_areas', '#id_equipos');
+
+        // 
+        $('#id_equipos').on('change', function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#id_codigo').val('');
+                $('#id_temperatura_minima').val('');
+                $('#id_temperatura_maxima').val('');
+            }
+            else {
+                $.getJSON("{% url 'equipos:detalle_equipo_json' 0 %}".replace(0, id), function(response) {
+                    console.log(response);
+                    var equipo = response;
+                    $('#id_codigo').val(equipo.codigo);
+                    $('#id_temperatura_minima').val(equipo.temperatura_minima);
+                    $('#id_temperatura_maxima').val(equipo.temperatura_maxima);
+                });
+            }
+        });
+
+        // Plugins para las fechas
+        $('#id_fecha_inicial, #id_fecha_final').datetimepicker({
+            format:'YYYY-MM-DD',
+            maxDate: moment(),
+        });
+
+        $("#id_fecha_inicial").on("dp.change", function (e) {
+            $('#id_fecha_final').data("DateTimePicker").minDate(e.date);
+        });
+        $("#id_fecha_final").on("dp.change", function (e) {
+            $('#id_fecha_inicial').data("DateTimePicker").maxDate(e.date);
+        });
+
+        // Grafico de temperatura
+        {% if equipo != None %}
+        var d = {{grafico|safe}};
+        drawChart($('#piechart_3d'), d, 'line');       
+        {% endif %}
+        
+        $('#imprimir').click(function(){
+            window.print();
+//            document.location.href = "{% url 'trazabilidad:tipo_resultado' %}";
+        });
+    });
+    </script>
+{% endblock js %}

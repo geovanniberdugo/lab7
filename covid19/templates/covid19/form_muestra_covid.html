@@ -1,0 +1,449 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block css %}
+<style>
+    .inline-checks .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+</style>
+{% endblock css %}
+
+{% block form_errors %}
+{% if form_info.errors %}
+<div class="alert alert-danger">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <strong>Corregir los siguientes errores en Formulario Info general!</strong> {{ form_informacion.errors }}
+</div>
+{% endif %}
+
+{% if form_info_paciente.errors %}
+<div class="alert alert-danger">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <strong>Corregir los siguientes errores en Formulario Info Paciente!</strong> {{ form_info_paciente.errors }}
+</div>
+{% endif %}
+{% if form_paciente.errors %}
+<div class="alert alert-danger">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <strong>Corregir los siguientes errores en Formulario Paciente!</strong> {{ form_paciente.errors }}
+</div>
+{% endif %}
+
+{% if formset_muestra.errors %}
+<div class="alert alert-danger">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <strong>Corregir los siguientes errores en Formulario Muestras!</strong> {{ formset_muestra.errors }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block paneles %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-user"></i> Datos parciales
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4">{{ form_info.departamento_upgd|as_crispy_field }}</div>
+            <div class="col-md-4">{{ form_info.municipio_upgd|as_crispy_field }}</div>
+            <div class="col-md-4">{{ form_info.upgd|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6">{{ form_paciente.sin_identificacion|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_paciente.identificacion|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_paciente.tipo_identificacion|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info_paciente.tipificacion|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_paciente.nombre|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_paciente.apellido|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_paciente.email|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info.pais_residencia|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.departamento_residencia|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.municipio_residencia|as_crispy_field }}</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-success usuario" style="display:none" id="usuario_nuevo">
+                    USUARIO NUEVO
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary" id="panel-muestras">
+    <div class="panel-heading">
+        <i class="fa fa-flask"></i> Muestras
+    </div>
+
+    <div class="panel-body">
+        {% for form in formset_muestra %}
+        <div class="formset-muestra346">
+            {{ form.muestra_ptr }}
+            <div class="row">
+                <div class="col-md-6">{{ form.fecha_toma|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.tipo_muestra|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form.pruebas|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.temp_ingreso|as_crispy_field }}</div>
+            </div>
+            {% if formset_muestra.can_delete %}
+            {{ form.DELETE }}
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        {{ formset_muestra.management_form }}
+    </div>
+</div>
+<button name="radicado" class="btn btn-primary">Ingreso Parcial</button>
+<br><br>
+<div class="panel panel-primary">
+    <div class="panel-heading text-center text-uppercase">
+        <h4> Datos Basicos</h4>
+    </div>
+
+    <div class="panel-body">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <i class="fa fa-info"></i> Información General
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">{{ form_info.evento|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.fecha_notificacion|as_crispy_field }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <i class="fa fa-file"></i> Identificación del Paciente
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">{{ form_paciente.fecha_nacimiento|as_crispy_field }}</div>
+                    <div class="col-md-2">{{ form_paciente.edad|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_paciente.tipo_edad|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info_paciente.telefono|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_paciente.sexo|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info_paciente.nacionalidad|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info_paciente.pais_ocurrencia|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info_paciente.departamento_ocurrencia|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info_paciente.municipio_ocurrencia|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info_paciente.area_ocurrencia|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info_paciente.localidad_ocurrencia|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info_paciente.barrio_ocurrencia|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">{{ form_info_paciente.lugar_ocurrencia|as_crispy_field }}</div>
+                    <div class="col-md-5">{{ form_info_paciente.vereda_zona|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info_paciente.ocupacion|as_crispy_field }}</div>
+                    <div class="col-md-3">{{ form_info_paciente.tipo_regimen|as_crispy_field }}</div>
+                    <div class="col-md-5">{{ form_info_paciente.eapb|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">{{ form_info_paciente.pertenencia_etnica|as_crispy_field }}</div>
+                    <div class="col-md-5">{{ form_info_paciente.estrato|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 inline-checks">{{ form_info_paciente.grupos_poblacionales|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">{{ form_info_paciente.semanas_gestacion|as_crispy_field }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <i class="fa fa-bell-o"></i> Notificación
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-5">{{ form_info.fuente|as_crispy_field }}</div>
+                    <div class="col-md-5">{{ form_info.direccion|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info.fecha_consulta|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.fecha_inicio_sintomas|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.clasificacion_inicial_caso|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">{{ form_info.hospitalizado|as_crispy_field }}</div>
+                    <div class="col-md-5">{{ form_info.fecha_hospitalizacion|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info.condicion_final|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.fecha_defuncion|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.certificado_defuncion|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">{{ form_info.causa_muerte|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.profesional_diligenciante|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_info.telefono|as_crispy_field }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <i class="fa fa-building"></i> Espacio exclusivo para uso de entes territoriales
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-5">{{ form_info.clasificacion_final_caso|as_crispy_field }}</div>
+                    <div class="col-md-5">{{ form_info.fecha_ajuste|as_crispy_field }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading text-center text-uppercase">
+        <h4> evento de notificación inmediata</h4>
+    </div>
+
+    <div class="panel-body">
+        {% block datos_especificos %}
+        {% endblock  %}
+    </div>
+</div>
+{% endblock paneles %}
+
+{% block botones %}
+<button name="confirmado" class="btn btn-primary">Confirmar Ingreso</button>
+{% endblock botones %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/jquery.formset.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/get_paciente_info.js' %}"></script>
+<script>
+    const fillMunicipio = (idDepartamento, idMunicipio) => {
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", idDepartamento, idMunicipio);
+    };
+
+    fillMunicipio('#id_general-departamento_upgd', '#id_general-municipio_upgd');
+    fillMunicipio('#id_general-departamento_residencia', '#id_general-municipio_residencia');
+    fillMunicipio('#id_info_paciente-departamento_ocurrencia', '#id_info_paciente-municipio_ocurrencia');
+    fillMunicipio('#id_general-departamento_viaje_nacional', '#id_general-municipio_viaje_nacional');
+
+    document.getElementById('id_paciente-identificacion').addEventListener('blur', ({ target }) => {
+        const value = target.value;        
+        if (document.getElementById('id_paciente-sin_identificacion').checked || !value) return;
+
+        fetch(`{% url "covid19:pacientes_json" %}?search=${value}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    $('#id_paciente-tipo_identificacion').val("").select2();
+                    $('#id_paciente-nombre').val("");
+                    $('#id_paciente-apellido').val("");
+                    $('#id_paciente-edad').val("");
+                    $('#id_paciente-email').val("");
+                    $('#id_paciente-tipo_edad').val("").select2();
+                    $('#id_paciente-sexo').val("").select2();
+                    $('#id_info_paciente-direccion').val("");
+                    $('#id_info_paciente-fecha_nacimiento').val("");
+                    $('#id_info_paciente-ocupacion').val("");
+                    $('#id_info_paciente-tipificacion').val("").select2();
+                    $('#id_info_paciente-telefono').val("");
+                    $('#id_info_paciente-nacionalidad').val("");
+                    $('#usuario_nuevo').css("display", "block");
+                } else {
+                    const paciente = data[0];
+                    const info = paciente.infos_covid19.length > 0 ? paciente.infos_covid19[0] : {};
+                    $('#id_paciente-tipo_identificacion').val(paciente.tipo_identificacion).select2();
+                    $('#id_paciente-nombre').val(paciente.nombre);
+                    $('#id_paciente-apellido').val(paciente.apellido);
+                    $('#id_paciente-email').val(paciente.email);
+                    $('#id_paciente-edad').val(paciente.edad);
+                    $('#id_paciente-sexo').val(paciente.sexo).select2();
+                    $('#id_paciente-tipo_edad').val(paciente.tipo_edad).select2();
+                    $('#id_info_paciente-telefono').val(info.telefono);
+                    $('#id_info_paciente-direccion').val(info.direccion);
+                    $('#id_info_paciente-ocupacion').val(info.ocupacion);
+                    $('#id_info_paciente-nacionalidad').val(info.nacionalidad);
+                    $('#id_info_paciente-tipificacion').val(info.tipificacion).select2();
+                    $('#id_info_paciente-fecha_nacimiento').val(info.fecha_nacimiento);
+                    $('#usuario_nuevo').css("display", "none");
+                }
+            });
+    });
+
+    $('form').on('focus', '.dateinput', function() {
+        $(this).datetimepicker({
+            format: 'DD/MM/YYYY',
+            maxDate: moment().format('YYYY/MM/DD'),
+        });
+    });
+
+    $("#id_paciente-fecha_nacimiento").on("dp.change", function (e) {
+        const birthdate = e.date;
+        const today = moment();
+        const age = moment.duration(today.diff(birthdate));
+        const years = age.years();
+        if (years > 0) {
+            $('#id_paciente-edad').val(years);
+            $('#id_paciente-tipo_edad').val('A').trigger('change');
+            return;
+        }
+
+        const months = age.months();
+        if (months > 0) {
+            $('#id_paciente-edad').val(months);
+            $('#id_paciente-tipo_edad').val('M').trigger('change');
+            return;
+        }
+
+        const days = age.days();
+        if (days > 0) {
+            $('#id_paciente-edad').val(days);
+            $('#id_paciente-tipo_edad').val('D').trigger('change');
+            return;
+        }
+
+        $('#id_paciente-tipo_edad').val('H').trigger('change');
+    });
+
+    const disableInputs = (ids = []) => {
+        ids.forEach(id => {
+            const elem = document.getElementById(id);
+            elem.disabled = true;
+            elem.value = '';
+        });
+    }
+
+    const disableSelects = (ids = []) => {
+        ids.forEach(id => {
+            const elem = document.getElementById(id);
+            elem.disabled = true;
+            $(`#${id}`).val('').select2();
+        });
+    }
+
+    const enableFields = (ids = []) => {
+        ids.forEach(id => {
+            const elem = document.getElementById(id);
+            elem.disabled = false;
+        });
+    }
+
+    $("#id_general-condicion_final").on('change', function({ target }) {
+        const fields = ['id_general-fecha_defuncion', 'id_general-certificado_defuncion'];
+        const selects = ['id_general-causa_muerte'];
+        
+        if (target.value === '1' || target.value === '0') {
+            disableInputs(fields);
+            disableSelects(selects);
+        } else {
+            enableFields([...fields, ...selects]);
+        }
+    });
+
+    $("#id_general-viaje_nacional").on('change', function ({ target }) {
+        const selects = [
+            'id_general-departamento_viaje_nacional',
+            'id_general-municipio_viaje_nacional',
+        ]
+
+        if (target.value === 'NO') {
+            disableSelects(selects);
+        } else {
+            enableFields(selects);
+        }
+    });
+
+    $("#id_general-viaje_internacional").on('change', function ({ target }) {
+        const selects = [
+            'id_general-pais_viaje_iternacional',
+        ]
+
+        if (target.value === 'NO') {
+            disableSelects(selects);
+        } else {
+            enableFields(selects);
+        }
+    });
+
+    $("#id_general-hospitalizado").on('change', function(e) {
+        let disabled = false;
+        if (e.target.value === 'NO') {
+            disabled = true;
+        }
+
+        document.getElementById("id_general-fecha_hospitalizacion").disabled = disabled;
+    });
+
+    $('.formset-muestra346').formset({
+        addText: 'Agregar muestra',
+        deleteText: 'Quitar',
+        added: function (row) {
+            row.find('select').val('').select2().trigger('change');
+        }
+    });
+
+    $(document).ready(function() {
+        $('#id_general-causa_muerte').select2({
+            theme: 'bootstrap',
+            minimumInputLength: 2,
+            ajax: {
+                dataType: 'json',
+                url: '{% url "covid19:cie10_json" %}',
+                data: function (params) {
+                    return { search: params.term };
+                },
+                processResults: function (data) {
+                    return { results: data };
+                },
+            }
+        });
+
+        $('#id_general-upgd').select2({
+            theme: 'bootstrap',
+            minimumInputLength: 2,
+            ajax: {
+                dataType: 'json',
+                url: '{% url "covid19:upgd_json" %}',
+                data: function (params) {
+                    return { search: params.term };
+                },
+                processResults: function (data) {
+                    return { results: data };
+                },
+            }
+        });
+
+        $('form').on('focus', '.date-toma', function () {
+            const base = $('#id_recepcion-fecha_recepcion').data('DateTimePicker').viewDate();
+            $(this).data("DateTimePicker").minDate(
+                base.subtract(30, 'days').startOf('day')
+            );
+        });
+    });
+</script>
+{% endblock js %}

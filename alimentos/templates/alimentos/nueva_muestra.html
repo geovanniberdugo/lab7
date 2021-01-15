@@ -1,0 +1,271 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block tipo_muestra_heading %}De Alimento{% endblock tipo_muestra_heading %}
+
+{% block form_errors %}
+    {% if form_informacion.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formulario Lugar de Recolección!</strong> {{ form_informacion.errors }}
+        </div>
+    {% endif %}
+
+    {% if formset_muestra.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formulario Muestras de Alimento!</strong> {{ formset_muestra.errors }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_action %}
+    {% if muestra_nueva %}
+        {% url 'alimentos:nueva_muestra' %}
+    {% else %}
+        {% url 'alimentos:actualizar_muestra' form_ingreso.instance.pk %}
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo_form %}
+	<div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Entidad Solicitante
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.solicitante.css_classes }}">
+                        <label class="control-label" for="id_solicitante">Solicitante:</label>
+                        {{ form_informacion.solicitante }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.direccion.css_classes }}">
+                        <label class="control-label" for="id_direccion">Dirección:</label>
+                        {{ form_informacion.direccion }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.responsable.css_classes }}">
+                        <label class="control-label" for="id_responsable">Responsable del Muestreo:</label>
+                        {{ form_informacion.responsable }}
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.cargo.css_classes }}">
+                        <label class="control-label" for="id_cargo">Cargo:</label>
+                        {{ form_informacion.cargo }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Lugar de Recolección
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.departamento.css_classes }}">
+                        <label class="control-label" for="id_departamento">Departamento:</label>
+                        {{ form_informacion.departamento }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.municipio.css_classes }}">
+                        <label class="control-label" for="id_municipio">Municipio:</label>
+                        {{ form_informacion.municipio }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.poblado.css_classes }}">
+                        <label class="control-label" for="id_poblado">Poblado:</label>
+                        {{ form_informacion.poblado }}
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.sitio_toma.css_classes }}">
+                        <label class="control-label" for="id_sitio_toma">Punto de la toma:</label>
+                        {{ form_informacion.sitio_toma }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.direccion_recoleccion.css_classes }}">
+                        <label class="control-label" for="id_direccion_recoleccion">Dirección:</label>
+                        {{ form_informacion.direccion_recoleccion }}
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="{{ form_informacion.fecha.css_classes }}">
+                        <label class="control-label" for="id_fecha">Fecha:</label>
+                        {{ form_informacion.fecha }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="panel-muestras">
+        <div class="panel-heading">
+            <i class="fa fa-flask"></i> Muestras de alimento
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+        	{% for form in formset_muestra %}
+                <div class="formset-alimento">
+        		  {% crispy form %}
+                  {% if formset_muestra.can_delete %}
+                    {{ form.DELETE }}                      
+                  {% endif %}
+                </div>
+        	{% endfor %}
+
+        	{{ formset_muestra.management_form }}
+        </div>
+    </div>
+{% endblock cuerpo_form %}
+
+
+{% block js %}
+	{{ block.super }}
+
+    {% if not muestra_nueva %}
+        <script src="{% static 'js/moment.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+    {% endif %}
+
+    <script type="text/javascript" src="{% static 'js/jquery.formset.js' %}"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$('#id_general-fecha').datetimepicker({
+            format:'DD/MM/YYYY HH:mm:ss'
+        });
+
+        //Llenando el municipio según el departamento
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_general-departamento', '#id_general-municipio');
+
+        //Llenando el poblado según el municipio
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_poblados_municipio_json' 0 %}", '#id_general-municipio', '#id_general-poblado');
+
+        //Llenando el tipo de alimento según el grupo
+        $('.select-grupo').change(function() {
+        	var id = $(this).val();
+        	var tipo_alimento = $(this).parents('.grupo').siblings('.tipo').find('select');
+        	
+        	if(id=="") {
+            	llenar_select(tipo_alimento, []);
+	        }
+	        else {
+	            $.getJSON("{% url 'alimentos:lista_categorias_json' 0 %}".replace(0, id), function(response){
+	                console.log(response);
+	                llenar_select_tipo_alimento(tipo_alimento, response);
+	            });
+	        }
+        });
+        
+        $('.select-tipo').change(function() {
+        	var id = $(this).val();
+        	var tipo_alimento = $(this).parents('.tipo').siblings('.subcategoria').find('select');
+        	
+        	if(id=="") {
+            	llenar_select(tipo_alimento, []);
+	        }
+	        else {
+	            $.getJSON("{% url 'alimentos:lista_sub_categorias_json' 0 %}".replace(0, id), function(response){
+	                console.log(response);
+	                llenar_select_tipo_alimento(tipo_alimento, response);
+	            });
+	        }
+        });
+
+        $('#panel-muestras').on('focus', '.input-año', function(){
+            $(this).datetimepicker({
+                format:'YYYY'
+            });
+        });
+
+        $('#panel-muestras').on('focus', '.input-mes', function(){
+            $(this).datetimepicker({
+                format:'MM'
+            });
+        });
+
+        $('#panel-muestras').on('focus', '.input-dia', function(){
+            $(this).datetimepicker({
+                format:'DD'
+            });
+        });
+
+        $('.select-fabricante').change(function(){
+            var id = $(this).val();
+            var nuevo_fabricante = $(this).parents('.fabricante').next('.nuevo-fabricante');
+
+            if(id=="") {
+                nuevo_fabricante.removeClass('hidden');
+            }
+            else {
+                nuevo_fabricante.addClass('hidden');
+            }
+        });
+
+        $('.no-aplica').change(function (event) {
+            var fechas = [$(this).siblings('.f-dia').find('input'), $(this).siblings('.f-mes').find('input'), $(this).siblings('.f-ano').find('input')]
+            if ($(this).find('input').is(':checked')) {
+                // desactiva fechas
+                for (var x of fechas) {
+                    x.attr('readonly', true);
+                }
+            } else {
+                // activa fechas
+                for (var x of fechas) {
+                    x.attr('readonly', false);
+                }
+            }
+        });
+
+        $('.select-distribuidor').change(function(){
+            var id = $(this).val();
+            var nuevo_distribuidor = $(this).parents('.distribuidor').next('.nuevo-distribuidor');
+
+            if(id=="") {
+                nuevo_distribuidor.removeClass('hidden');
+            }
+            else {
+                nuevo_distribuidor.addClass('hidden');
+            }
+        });
+
+        $('.select-motivo-analisis').on("change", function(){
+            var id = $(this).val();
+            var nuevo_motivo = $(this).parents('.motivo-analisis').next('.nuevo-motivo-analisis');
+            if(id=="") {
+                nuevo_motivo.removeClass('hidden');
+            }
+            else {
+                nuevo_motivo.addClass('hidden');
+            }
+        });
+
+        $('.formset-alimento select').select2("destroy");
+
+        $('.formset-alimento').formset({
+            addText: 'Agregar muestra',
+            deleteText: 'Quitar',
+            added: function(row){
+                row.find('select').val('').trigger('change');
+            }
+        });
+
+        $('.no-aplica').change();
+	});
+	</script>	
+{% endblock js %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block heading %}
+    Solicitud De Procesamiento De Muestras {% block tipo_muestra_heading %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-md-12">
+        {% if form_ingreso.errors %}
+            <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Corregir los siguientes errores en Formulario Recepción Muestra!</strong> {{ form_ingreso.errors }}
+            </div>
+        {% endif %}
+
+        {% block form_errors %}
+        {% endblock %}
+    </div>
+    </div>
+
+    <form method="POST" action="{% block form_action %}{% endblock %}">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Recepción Muestra
+            </div>
+
+            <div class="panel-body">
+                <div class="col-md-4">
+                    <p class="{{ form_ingreso.fecha_recepcion.css_classes }}">
+                        <label class="control-label" for="id_fecha_recepcion">Fecha de recepción:</label>
+                        {{ form_ingreso.fecha_recepcion }}
+                    </p>
+                </div>
+                <div class="col-md-8">
+                    <div class="alert alert-danger radicado">
+                        RAD. {% if muestra_nueva %}**********{% else %}{{ form_ingreso.instance.radicado }} <img src="{% get_media_prefix %}barcode/{{ form_ingreso.instance.radicado }}.svg">{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% block paneles %}
+        <div class="panel panel-primary">
+            <div class="panel-heading text-center text-uppercase">
+                <h5> Datos Génerales</h5>
+            </div>
+
+            <div class="panel-body">
+                {% block cuerpo_form %}
+                    {% block form_pruebas %}
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div id="div_pruebas" class="{{ form_muestra.pruebas.css_classes }}">
+                                    <label class="control-label" for="id_pruebas">Pruebas Solicitadas:</label>
+                                    {% for prueba in form_muestra.pruebas %}
+                                        <div class="checkbox">
+                                            {{ prueba }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endblock %}
+                {% endblock %}
+            </div>
+        </div>
+        {% endblock paneles %}
+    </div>
+
+    {% block botones %}
+    <button name="radicado" class="btn btn-primary">Ingreso Parcial</button>
+    <button name="confirmado" class="btn btn-primary">Confirmar Ingreso</button>
+    {% endblock botones %}
+    <br><br>
+    </form>
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'js/funciones_apoyo.js' %}"></script>
+    <script src="{% static 'js/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/es.js"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_recepcion-fecha_recepcion').datetimepicker({
+            format:'DD/MM/YYYY HH:mm:ss',
+            minDate: moment().subtract(7, 'days').startOf('day'),
+        });
+    });
+    </script>
+{% endblock %}

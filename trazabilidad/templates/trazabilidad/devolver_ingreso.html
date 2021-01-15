@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block heading %}Devolver Pruebas a Estado Análisis del Ingreso {{ ingreso.radicado }}{% endblock heading %}
+
+{% block content %}
+	{% for muestra in ingreso.muestras.all %}
+        <div class="panel panel-primary">
+        <div class="panel-heading text-center">{{ ingreso.radicado }}{%if ingreso.programa.nombre == 'aguas' %}-{{ forloop.counter }}{% endif %}</div>
+        <div class="table-responsive">
+            <table class="table">
+            <form action="" method="POST">
+                {% csrf_token %}
+                {% regroup muestra.pruebasrealizadas_set.all by prueba.area as pruebas_agrupadas %}
+                {% for grupo in pruebas_agrupadas %}
+                    <tr><th colspan="4" class="text-center">{{ grupo.grouper|upper }}</th></tr>
+                    <tr>
+                    <th>Prueba</th>
+                    <th>Estado</th>
+                    <th>Cumplimiento</th>
+                    <th></th>
+                </tr>
+                    {% for prueba in grupo.list %}
+                    <tr id="anchor-{{ prueba.id }}" >
+                        <td>{{ prueba.prueba.nombre|upper }}</td>
+                        <td>{{ prueba.get_estado_display }}</td>
+                        <td>{{ prueba.cumplimiento }}%</td>
+                    	<td>
+                    	{% if prueba.cumplimiento == 100 %}
+                            <button name="devolver_prueba" value="{{ prueba.id }}" class="btn btn-primary btn-xs" title="Devolver"><i class="glyphicon glyphicon-arrow-left"></i></button>
+                    	{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </form>
+            </table>
+        </div>
+        </div>
+    {% endfor %}
+{% endblock content %}

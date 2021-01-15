@@ -1,0 +1,40 @@
+{% load crispy_forms_tags %}
+
+<div class="modal fade" id="modal-comment-{{ ingreso.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">{{ ingreso.radicado }}</div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Motivos de rechazo</h4>
+                        <ul>
+                            {% for motivo in ingreso.motivo_rechazo_analista.all %}
+                            <li>{{ motivo|upper }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Observaciones</h4>
+                        <p>{{ ingreso.observaciones_analista|upper }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Acción</h4>
+                        <form id="form-comment" method="POST" action="{% url 'trazabilidad:comentario_recepcionista' ingreso.id %}">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button name="comentar" form="form-comment" class="btn btn-primary">Comentar</button>
+                <button data-dismiss="modal" class="btn btn-primary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>

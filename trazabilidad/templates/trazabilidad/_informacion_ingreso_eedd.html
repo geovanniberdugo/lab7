@@ -1,0 +1,62 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+<h4>Origen de la Muestra</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Institución</th>
+        <td>{{ muestra.institucion.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Departamento</th>
+        <td>{{ muestra.institucion.municipio.departamento|upper }}</td>
+    </tr>
+    <tr>
+        <th>Municipio</th>
+        <td>{{ muestra.institucion.municipio|upper }}</td>
+    </tr>
+    <tr>
+        <th>Dirección</th>
+        <td>{{ muestra.institucion.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Nit</th>
+        <td>{{ muestra.institucion.nit|upper }}</td>
+    </tr>
+</table>
+
+
+<h4>Información de la Muestra</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Control</th>
+        <td>{{ muestra.control.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Tipo de muestra</th>
+        <td>{{ muestra.tipo_muestra.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Tipo de evento</th>
+        <td>{{ muestra.tipo_evento.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Pruebas Solicitadas</th>
+        <td>
+            {% for prueba in muestra.pruebas.all.distinct %}
+                {{ prueba.nombre|upper }}
+                {% if not forloop.last %}
+                    -
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+</table>

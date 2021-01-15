@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Aprobacion informe resultados{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.21/sl-1.3.1/datatables.min.css" />
+<style>
+    table.dataTable tbody tr.selected {
+        color: inherit;
+        background-color: inherit;
+    }
+
+    .hint span {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: inline-block;
+        background-color: #f2dede;
+    }
+</style>
+{% endblock %}
+
+{% block heading %}APROBACION INFORME DE RESULTADOS{% endblock %}
+
+{% block content %}
+<p class="hint"><span></span> Resultado positivo</p>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="text-center"><input type="checkbox" class="selectAll" name="selectAll" value="all"></th>
+                <th>Radicado</th>
+                <th>Fecha</th>
+                <th>Programa</th>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ingreso in ingresos %}
+            <tr data-ingreso="{{ ingreso.id }}" {% if ingreso.is_positivo %}class="danger"{% endif %}>
+                <td></td>
+                <td>{{ ingreso.radicado }}</td>
+                <td>{{ ingreso.fecha_recepcion }}</td>
+                <td>{{ ingreso.programa|title }}</td>
+                <td>
+                    <a class="btn btn-primary btn-xs" href="{% url 'trazabilidad:informe_documento' ingreso.id %}">
+                        <i class="glyphicon glyphicon-print"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<button id="aprove" class="btn btn-primary" data-url="{% url 'trazabilidad:aprobar_informes_api' %}">Aprobar</button>
+<br><br>
+{% csrf_token %}
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.21/sl-1.3.1/datatables.min.js"></script>
+<script type="text/javascript" src="{% static 'js/datatable.es.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        const dtTable = $('table').DataTable({
+            ordering: false,
+            searching: true,
+            lengthChange: false,
+            language: {
+                ...datatableEs,
+                sSearch: 'Buscar radicado',
+            },
+
+            columnDefs: [
+                {
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets: 0,
+                },
+                {
+                    searchable: false,
+                    targets: [0, 2, 3, 4],
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+
+        const selectAll = document.querySelector('.selectAll');
+        selectAll.addEventListener('click', ({ target }) => {
+            if (target.checked) {
+                dtTable.rows({ page: 'current' }).select();
+            } else {
+                dtTable.rows({ page: 'current' }).deselect();
+            }
+        });
+
+        const setSelectAllState = () => {
+            selectAll.checked = dtTable.rows({ page: 'current' }).ids().length === dtTable.rows({ page: 'current', selected: true }).ids().length;
+        }
+
+        dtTable.on('page.dt', function () {
+            setSelectAllState();
+        });
+
+        dtTable.on('select', function () {
+            setSelectAllState();
+        });
+
+        dtTable.on('deselect', function () {
+            setSelectAllState();
+        });
+
+        const csrf = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        document.getElementById('aprove').addEventListener('click', ({ target }) => {
+            const ingresos = dtTable.rows({ selected: true }).nodes().map(n => n.dataset.ingreso).toArray();
+
+            if (ingresos.length === 0) {
+                alert('Debe seleccionar por lo menos un ingreso para aprobar.');
+                return;
+            }
+
+            target.disabled = true;
+            target.innerText = 'Aprobando.....';
+            fetch(target.dataset.url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ingresos }),
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok) {
+                        document.location.reload();
+                        return;
+                    }
+
+                    alert('Hubo un error');
+                    target.disabled = false;
+                    target.innerText = 'Aprobar';
+                })
+                .catch(err => {
+                    alert('Hubo un error');
+                    target.disabled = false; 
+                    target.innerText = 'Aprobar';
+                });
+
+        });
+    });
+</script>
+{% endblock js %}

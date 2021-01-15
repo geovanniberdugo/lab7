@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block title %}Envio masivo de resultados{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.21/sl-1.3.1/datatables.min.css" />
+{% endblock %}
+
+{% block heading %}ENVIO MASIVO DE RESULTADOS COVID19{% endblock %}
+
+{% block content %}
+    {% include 'components/messages-alert.html' %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3">{{ form.fecha_inicial|as_crispy_field }}</div>
+            <div class="col-md-3">{{ form.fecha_final|as_crispy_field }}</div>
+            <div class="col-md-3">{{ form.upgd|as_crispy_field }}</div>
+            <div class="col-md-3">{{ form.municipio_upgd|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary"><i class="glyphicon glyphicon-search"></i> Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <br>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center"><input type="checkbox" class="selectAll" name="selectAll" value="all"></th>
+                    <th>Radicado</th>
+                    <th>Paciente</th>
+                    <th>UPGD</th>
+                    <th>Municipio UPGD</th>
+                    <th>Enviado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ingreso in ingresos %}
+                <tr data-ingreso="{{ ingreso.id }}">
+                    <td></td>
+                    <td>{{ ingreso.radicado }}</td>
+                    <td>
+                        {{ ingreso.muestra.paciente|title }} <br>
+                        {{ ingreso.muestra.paciente.tipo_identificacion }} {{ ingreso.muestra.paciente.identificacion }}
+                    </td>
+                    <td>{{ ingreso.solicitante|title }}</td>
+                    <td>{{ ingreso.muestra.municipio_upgd|title }}</td>
+                    <td>{% if ingreso.fecha_envio_resultados %}SI{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if ingresos %}
+    <div class="row">
+        <div class="col-md-12">
+            <button id="send" class="btn btn-primary" data-url="{% url 'covid19:send_results_email_api' %}"><i class="glyphicon glyphicon-envelope"></i> Enviar</button>
+        </div>
+    </div>
+    <br><br>
+    {% endif %}
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'js/moment.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/es.js"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.21/sl-1.3.1/datatables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.dateinput').datetimepicker({
+            format: 'YYYY-MM-DD'
+        });
+
+        $("#id_fecha_inicial").on("dp.change", function (e) {
+            $('#id_fecha_final').data("DateTimePicker").minDate(e.date);
+        });
+        $("#id_fecha_final").on("dp.change", function (e) {
+            $('#id_fecha_inicial').data("DateTimePicker").maxDate(e.date);
+        });
+
+        const dtTable = $('table').DataTable({
+            ordering: false,
+            searching: false,
+            lengthChange: false,
+            language: {
+                url: 'http://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json',
+            },
+
+            columnDefs: [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+
+        document.querySelector('.selectAll').addEventListener('click', ({ target }) => {
+            if (target.checked) {
+                dtTable.rows().select();
+            } else {
+                dtTable.rows().deselect();
+            }
+        });
+
+        const csrf = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        document.getElementById('send').addEventListener('click', ({ target }) => {
+            const ingresos = dtTable.rows({selected: true}).nodes().map(n => n.dataset.ingreso).toArray();
+
+            if (ingresos.length === 0) {
+                alert('Debe seleccionar por lo menos un resultado para enviar.');
+                return;
+            }
+
+            target.disabled = true;
+            fetch(target.dataset.url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ingresos }),
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok) {
+                        document.querySelector('form button').click();
+                        return;
+                    }
+
+                    alert('Hubo un error');
+                    target.disabled = false;
+                })
+                .catch(err => {
+                    alert('Hubo un error');
+                    target.disabled = false;
+                });
+
+        });
+    });
+</script>
+{% endblock js %}

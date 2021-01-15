@@ -1,0 +1,350 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block tipo_muestra_heading %}De Agua{% endblock %}
+
+{% block form_errors %}
+    {% if form_informacion.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formulario Datos de la Muestra!</strong> {{ form_informacion.errors }}
+        </div>
+    {% endif %}
+
+    {% if formset_muestra_agua.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formulario Muestras de Agua!</strong> {{ formset_muestra_agua.errors }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_action %}
+    {% if muestra_nueva %}
+        {% url 'trazabilidad:nueva_muestra_agua' %}
+    {% else %}
+        {% url 'trazabilidad:actualizar_muestra_agua' form_ingreso.instance.pk %}
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo_form %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Origen de la Muestra
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">{{ form_informacion.departamento|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form_informacion.municipio|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form_informacion.poblado|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>
+                        <label class="control-label" for="id_nombre">Nombre EPSA:</label>
+                        <input id="id_epsa-nombre" class="form-control" type="text" name="epsa-nombre" disabled value="{{ form_informacion.instance.poblado.epsa }}">
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p>
+                        <label class="control-label" for="id_direccion">Direccion:</label>
+                        <input id="id_epsa-direccion" class="form-control" type="text" name="epsa-direccion" disabled value="{{ form_informacion.instance.poblado.epsa.direccion|capfirst }}">
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p>
+                        <label class="control-label" for="id_nit">Nº Nit:</label>
+                        <input id="id_epsa-nit" class="form-control" type="text" name="epsa-nit" disabled value="{{ form_informacion.instance.poblado.epsa.nit }}">
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Datos de la Muestra
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">{{ form_informacion.fecha_recoleccion|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form_informacion.responsable_toma|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form_informacion.solicitante|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">{{ form_informacion.tipo_agua|as_crispy_field }}</div>
+                <div id="nuevo_tipo_agua" {% if form_informacion.instance.tipo_agua %}class="hidden"{% endif %}>
+                    <div class="col-md-4">{{ form_informacion.clase_tipo_agua|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form_informacion.nuevo_tipo_agua|as_crispy_field }}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">{{ form_informacion.temperatura|as_crispy_field }}</div>
+                <div id="nueva_temperatura" class="col-md-4 {% if form_informacion.instance.temperatura %}hidden{% endif %}">
+                    {{ form_informacion.nueva_temperatura|as_crispy_field }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="panel-muestras-agua">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Muestras de agua
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+        {% for form_agua in formset_muestra_agua %}
+            <div class="formset-agua">
+                {{ form_agua.muestra_ptr }}
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_agua.hora_toma.css_classes }}">
+                            <label class="control-label" for="id_hora_toma_{{ forloop.counter0 }}">
+                                Hora de toma:
+                            </label>
+                            {{ form_agua.hora_toma }}
+                        </p>
+                    </div>
+                    <div class="col-md-3 codigo-punto">
+                        <p class="{{ form_agua.codigo_punto.css_classes }}">
+                            <label class="control-label" for="id_codigo_punto_{{ forloop.counter0 }}">
+                                Cod. del punto:
+                            </label>
+                            {{ form_agua.codigo_punto }}
+                        </p>
+                    </div>
+                    <div class="col-md-3 direccion-punto">
+                        <p>
+                            <label class="control-label" for="id_direccion_{{ forloop.counter0 }}">
+                                Dirección:
+                            </label>
+                            <input id="id_form-{{ forloop.counter0 }}-direccion" class="form-control" type="text" name="form-{{ forloop.counter0 }}-direccion" disabled value="{{ form_agua.instance.codigo_punto.direccion|capfirst }}">
+                        </p>
+                    </div>
+                    <div class="col-md-3 lugar-punto">
+                        <p>
+                            <label class="control-label" for="id_lugar_toma_{{ forloop.counter0 }}">
+                                Lugar punto de toma:
+                            </label>
+                            <input id="id_form-{{ forloop.counter0 }}-lugar_toma" class="form-control" type="text" name="form-{{ forloop.counter0 }}-lugar_toma" disabled value="{{ form_agua.instance.codigo_punto.lugar_toma|capfirst }}">
+                        </p>
+                    </div>
+                    <div class="col-md-3 descripcion-punto">
+                        <p>
+                            <label class="control-label" for="id_descripcion_{{ forloop.counter0 }}">
+                                Descripción:
+                            </label>
+                            <input id="id_form-{{ forloop.counter0 }}-descripcion" class="form-control" type="text" name="form-{{ forloop.counter0 }}-descripcion" disabled value="{{ form_agua.instance.codigo_punto.descripcion|capfirst }}">
+                        </p>
+                    </div>
+                    <div class="col-md-3 fuente-punto">
+                        <p>
+                            <label class="control-label" for="id_fuente_{{ forloop.counter0 }}">
+                                Fuente de abastecimiento:
+                            </label>
+                            <input id="id_form-{{ forloop.counter0 }}-fuente" class="form-control" type="text" name="form-{{ forloop.counter0 }}-fuente" disabled value="{{ form_agua.instance.codigo_punto.fuente_abastecimiento|capfirst }}">
+                        </p>
+                    </div>
+                    <div class="col-md-3 intra-punto">
+                        <p>
+                            <label class="control-label" for="id_intra_{{ forloop.counter0 }}">
+                                Punto intradomiciliario:
+                            </label>
+                            <input id="id_form-{{ forloop.counter0 }}-intra" class="form-control" type="text" name="form-{{ forloop.counter0 }}-intra" disabled value="{{ form_agua.instance.codigo_punto.get_punto_intradomiciliario_display|capfirst }}">
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="{{ form_agua.concertado.css_classes }}">
+                            <label class="control-label" for="id_concertado_{{ forloop.counter0 }}">
+                                Concertado:
+                            </label>
+                            {{ form_agua.concertado }}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 motivo-analisis">
+                        {{ form_agua.temp_ingreso|as_crispy_field }}
+                    </div>
+                    <div class="col-md-3 motivo-analisis">
+                        <p class="{{ form_agua.motivo_analisis.css_classes }}">
+                            <label class="control-label" for="id_motivo_analisis_{{ forloop.counter0 }}">
+                                Motivo del analisis:
+                            </label>
+                            {{ form_agua.motivo_analisis }}
+                        </p>
+                    </div>
+                    <div class="col-md-3 nuevo-motivo-analisis {% if form_agua.instance.motivo_analisis %}hidden{% endif %}">
+                        <p class="{{ form_agua.nuevo_motivo_analisis.css_classes }}">
+                            <label class="control-label" for="id_nuevo_motivo_analisis_{{ forloop.counter0 }}">
+                                Nuevo motivo del analisis:
+                            </label>
+                            {{ form_agua.nuevo_motivo_analisis }}
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="{{ form_agua.areas.css_classes }}">
+                            <label class="control-label" for="id_areas_{{ forloop.counter0 }}">
+                                Analisis solicitado:
+                            </label><br>
+                            {% for area in form_agua.areas %}
+                                <label class="checkbox-inline" id="{{ area.id_for_label }}">
+                                    {{ area.tag }} {{ area.choice_label }}
+                                </label>
+                            {% endfor %}
+                        </p>
+                    </div>
+                    {% if formset_muestra_agua.can_delete %}
+                        {{ form_agua.DELETE }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+        {{ formset_muestra_agua.management_form }}
+        </div>
+    </div>
+{% endblock cuerpo_form %}
+
+{% block js %}
+    {{ block.super }}
+
+    {% if not muestra_nueva %}
+        <script src="{% static 'js/moment.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+    {% endif %}
+
+    <script type="text/javascript" src="{% static 'js/jquery.formset.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_general-fecha_recoleccion').datetimepicker({
+            format:'DD/MM/YYYY'
+        });
+
+        $('#panel-muestras-agua').on('focus', '.input-hora-toma', function(){
+            $(this).datetimepicker({
+                format:'HH:mm:ss'
+            });
+        });
+
+        //Llenando el municipio según el departamento
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_general-departamento', '#id_general-municipio');
+
+        //Llenando el poblado según el municipio
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_poblados_municipio_json' 0 %}", '#id_general-municipio', '#id_general-poblado');
+
+
+        $('#id_general-poblado').on("change", function(){
+            var id = $(this).val();
+            if(id=="")
+            {
+                $('#id_epsa-nombre').val("");
+                $('#id_epsa-direccion').val("");
+                $('#id_epsa-nit').val("");
+
+                llenar_select('.select-codigo-punto', [], null);
+            }
+            else
+            {
+                $.getJSON("{% url 'trazabilidad:poblado_detalle_epsa_json' 0 %}".replace(0, id), function(response){
+                    // console.log(response);
+                    if(response!=null)
+                    {
+                        var epsa = response;
+                        $('#id_epsa-nombre').val(epsa.nombre);
+                        $('#id_epsa-direccion').val(epsa.direccion);
+                        $('#id_epsa-nit').val(epsa.nit);
+                    }
+                });
+
+                $.getJSON("{% url 'trazabilidad:lista_codigos_punto_poblados_json' 0 %}".replace(0, id), function(response){
+                    // console.log(response);
+                    llenar_select_codigo_punto('.select-codigo-punto', response);
+                });
+            }
+        });
+
+        $('#id_general-tipo_agua').on("change", function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#nuevo_tipo_agua').removeClass('hidden');
+            }
+            else {
+                $('#nuevo_tipo_agua').addClass('hidden');
+            }
+        });
+
+        $('#id_general-temperatura').on("change", function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#nueva_temperatura').removeClass('hidden');
+            }
+            else {
+                $('#nueva_temperatura').addClass('hidden');
+            }
+        });
+
+        $('.select-motivo-analisis').on("change", function(){
+            var id = $(this).val();
+            var nuevo_motivo = $(this).parents('.motivo-analisis').next('.nuevo-motivo-analisis');
+            if(id=="") {
+                nuevo_motivo.removeClass('hidden');
+            }
+            else {
+                nuevo_motivo.addClass('hidden');
+            }
+        });
+
+        $('.select-codigo-punto').change(function(){
+            var id = $(this).val();
+            var direccion_punto = $(this).parents('.codigo-punto').next('.direccion-punto').find('input');
+            var lugar_punto = $(this).parents('.codigo-punto').siblings('.lugar-punto').find('input');
+            var descripcion = $(this).parents('.codigo-punto').siblings('.descripcion-punto').find('input');
+            var fuente = $(this).parents('.codigo-punto').siblings('.fuente-punto').find('input');
+            var intra = $(this).parents('.codigo-punto').siblings('.intra-punto').find('input');
+            if(id=="") {
+                direccion_punto.val("");
+                descripcion.val("");
+                lugar_punto.val("");
+                fuente.val("");
+                intra.val("");
+            }
+            else {
+                $.getJSON("{% url 'trazabilidad:detalle_codigo_punto_json' 0 %}".replace(0, id), function(response){
+                    console.log(response);
+                    if(response!=null)
+                    {
+                        var informacion = response;
+                        direccion_punto.val(informacion.direccion);
+                        lugar_punto.val(informacion.lugar_toma.nombre);
+                        descripcion.val(informacion.descripcion.nombre);
+                        fuente.val(informacion.fuente_abastecimiento.nombre);
+                        intra.val(informacion.punto_intradomiciliario);
+                    }
+                });
+            }
+        });
+
+        $('.select-concertado').select2("destroy");
+        $('.select-codigo-punto').select2("destroy");
+        $('.select-motivo-analisis').select2("destroy");
+
+        $('.formset-agua').formset({
+            addText: 'Agregar muestra',
+            deleteText: 'Quitar',
+            added: function(row){
+                // console.log(row);
+                var nuevo_select = row.find(".select-codigo-punto");
+                // console.log(nuevo_select);
+                var viejo_select = row.prev(".formset-agua").find(".select-codigo-punto");
+                // console.log(viejo_select);
+
+                nuevo_select.html(viejo_select.html());
+
+            }
+        });
+    });
+    </script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+    <h4>ORIGEN DE LA MUESTRA</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>NOMBRE</th>
+            <td>{{ muestra.institucion.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>CÓDIGO</th>
+            <td>{{ muestra.institucion.codigo|upper }}</td>
+        </tr>
+        <tr>
+            <th>DEPARTAMENTO</th>
+            <td>{{ muestra.institucion.municipio.departamento|upper }}</td>
+        </tr>
+        <tr>
+            <th>MUNICIPIO</th>
+            <td>{{ muestra.institucion.municipio|upper }}</td>
+        </tr>
+    </table>
+
+    <h4>DATOS DE LA MUESTRA</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>NOMBRE</th>
+            <td>{{ muestra.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>IDENTIFICACION</th>
+            <td>{{ muestra.identificacion|upper }}</td>
+        </tr>
+        <tr>
+            <th>EDAD</th>
+            <td>{{ muestra.edad|upper }} {{ muestra.get_tipo_edad_display|upper }}</td>
+        </tr>
+        <tr>
+            <th>CONTROL</th>
+            <td>{{ muestra.control.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>PROGRAMA</th>
+            <td>{{ muestra.programa.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>TIPO DE EVENTO</th>
+            <td>{{ muestra.tipo_evento.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>TIPO DE MUESTRA</th>
+            <td>{{ muestra.tipo_muestra.nombre|upper }}</td>
+        </tr>
+    </table>
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'trazabilidad:estado_muestra_eeid' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'trazabilidad:actualizar_muestra_eeid' ingreso.id %}{% endblock %}

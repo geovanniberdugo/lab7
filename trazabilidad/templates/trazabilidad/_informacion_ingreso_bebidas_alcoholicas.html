@@ -1,0 +1,174 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+{% with info=muestra.informacion_general  %}
+
+<h4>Entidad Solicitante</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Institución Solicitante</th>
+        <td>{{ info.institucion.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Dirección Solicitante</th>
+        <td>{{ info.institucion.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Responsable Toma</th>
+        <td>{{ info.responsable_entrega|upper }}</td>
+    </tr>
+    <tr>
+        <th>Cargo</th>
+        <td>{{ info.cargo|upper }}</td>
+    </tr>
+    <tr>
+        <th>Número de Caso</th>
+        <td>{{ info.numero_caso|upper }}</td>
+    </tr>
+    <tr>
+        <th>Número de Oficio</th>
+        <td>{{ info.numero_oficio|upper }}</td>
+    </tr>
+</table>
+
+<h4>Lugar de Recolección</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Departamento</th>
+        <td>{{ info.poblado.municipio.departamento|upper }}</td>
+    </tr>
+    <tr>
+        <th>Municipio</th>
+        <td>{{ info.poblado.municipio|upper }}</td>
+    </tr>
+    <tr>
+        <th>Poblado</th>
+        <td>{{ info.poblado|upper }}</td>
+    </tr>
+    <tr>
+        <th>Sitio de Toma</th>
+        <td>{{ info.sitio_toma|upper }}</td>
+    </tr>
+    <tr>
+        <th>Propietario</th>
+        <td>{{ info.propietario|upper }}</td>
+    </tr>
+    <tr>
+        <th>Dirección</th>
+        <td>{{ info.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Fecha</th>
+        <td>{{ info.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+    </tr>
+</table>
+
+
+<h4>Información de la Muestra</h4>
+{% for mu in ingreso.muestras.all %}
+    <table class="table table-bordered">
+        <h5>Muestra #{{forloop.counter}}</h5>
+        {% if mu.decreto %}
+        <tr>
+            <th>Normatividad</th>
+            <td>{{ mu.decreto.nombre|upper }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th>Temperatura</th>
+            <td>{{ mu.temperatura|upper }}</td>
+        </tr>
+        <tr>
+            <th>Nombre del Producto</th>
+            <td>{{ mu.producto.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>Grupo de Bebida Alcohólica</th>
+            <td>{{ mu.producto.grupo.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>Registro Sanitario</th>
+            <td>{{ mu.registro_sanitario|upper }}</td>
+        </tr>
+        <tr>
+            <th>Numero Lote</th>
+            <td>{{ mu.numero_lote|upper }}</td>
+        </tr>
+        {% if mu.no_aplica_vencimiento %}
+            <tr>
+                <th>Fecha Vencimiento</th>
+                <td>NO APLICA VENCIMIENTO</td>
+            </tr>
+        {% else %}
+            <tr>
+                <th>Año Vencimiento</th>
+                <td>{{ mu.ano_vencimiento|upper }}</td>
+            </tr>
+            {% if mu.mes_vencimiento %}
+                <tr>
+                    <th>Mes Vencimiento</th>
+                    <td>{{ mu.mes_vencimiento|upper }}</td>
+                </tr>
+            {% endif %}
+            {% if mu.dia_vencimiento %}
+                <tr>
+                    <th>Dia Vencimiento</th>
+                    <td>{{ mu.dia_vencimiento|upper }}</td>
+                </tr>
+            {% endif %}
+        {% endif %}
+        <tr>
+            <th>Fabricante</th>
+            <td>{{ mu.fabricante|upper }}</td>
+        </tr>
+        <tr>
+            <th>Dirección Fabricante</th>
+            <td>{{ mu.direccion_fabricante|upper }}</td>
+        </tr>
+        <tr>
+            <th>Grado</th>
+            <td>{{ mu.grado|upper }}</td>
+        </tr>
+        <tr>
+            <th>Contenido</th>
+            <td>{{ mu.contenido|upper }}</td>
+        </tr>
+        <tr>
+            <th>Tipo de Envase</th>
+            <td>{{ mu.tipo_envase.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>Aspecto Externo</th>
+            <td>{{ mu.get_aspecto_externo_display|upper }}</td>
+        </tr>
+        <tr>
+            <th>Aspecto Interno</th>
+            <td>{{ mu.get_aspecto_interno_display|upper }}</td>
+        </tr>
+        <tr>
+            <th>Hermeticidad</th>
+            <td>{{ mu.get_hermeticidad_display|upper }}</td>
+        </tr>
+        <tr>
+            <th>Pruebas Solicitadas</th>
+            <td>
+                {% for prueba in mu.areas %}
+                    {{ prueba.nombre|upper }}
+                    {% if not forloop.last %}
+                        -
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+{% endfor %}
+
+{% endwith %}

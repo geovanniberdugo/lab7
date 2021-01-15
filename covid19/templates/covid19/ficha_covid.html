@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/_informe_nuevo_grande.css' %}">
+{% endblock %}
+
+{% block title %}Ficha{% endblock %}
+
+{% block heading %}
+    {% include 'trazabilidad/_encabezado_informes.html' with titulo=title %}
+{% endblock %}
+    
+{% block content %}
+{% if imprimir %}
+<div class="hidden-print">
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="col-xs-1">
+            <button type="submit" name="imprimir" class="btn btn-default btn-sm hidden-print">
+                <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+            </button>
+        </div>
+    </form>
+    <br>
+</div>
+{% endif %}
+
+<div>
+    <h3 id="num-radicado-" class="pull-right radicado-print">RADICADO NO. {{ ingreso.radicado }}</h3>
+</div>
+<table class="table table-bordered">
+    <tr>
+        <th>FECHA DE RECEPCIÓN</th>
+        <td>{{ ingreso.fecha_recepcion|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+    </tr>
+</table>
+
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">INFORMACIÓN GENERAL</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>DEPARTAMENTO UPGD</th>
+                <td>{{ info_general.municipio_upgd.departamento }}</td>
+                <th>MUNICIPIO UPGD</th>
+                <td>{{ info_general.municipio_upgd }}</td>
+                <th>CÓDIGO UPGD</th>
+                <td>{{ ingreso.solicitante.codigo }} {{ ingreso.solicitante.subindice }}</td>
+                <th>UPGD</th>
+                <td>{{ ingreso.solicitante }}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            <tr>
+                <th>NOMBRE DEL EVENTO</th>
+                <td>{% firstof info_general.get_evento_display 'SIN DATOS' %}</td>
+                <th>CÓDIGO DEL EVENTO</th>
+                <td>{% firstof info_general.evento 'SIN DATOS' %}</td>
+                <th>FECHA DE LA NOTIFICACIÓN</th>
+                <td>{% firstof info_general.fecha_notificacion|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">IDENTIFICACIÓN DEL PACIENTE</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>TIPO DE DOCUMENTO</th>
+                <td>{{ paciente.get_tipo_identificacion_display }}</td>
+                <th>NÚMERO DE IDENTIFICACIÓN</th>
+                <td>{{ paciente.identificacion }}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>NOMBRES Y APELLIDOS</th>
+                <td>{{ paciente.nombre }} {{ paciente.apellido }}</td>
+                <th>TELÉFONO</th>
+                <td>{% firstof info_paciente.telefono 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            <tr>
+                <th>FECHA DE NACIMIENTO</th>
+                <td>{% firstof info_paciente.fecha_nacimiento|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+                <th>EDAD</th>
+                <td>{% firstof paciente.edad 'SIN DATOS' %} {{ paciente.get_tipo_edad_display }}</td>
+                <th>SEXO</th>
+                <td>{% firstof paciente.get_sexo_display 'SIN DATOS' %}</td>
+                <th>NACIONALIDAD</th>
+                <td>{% firstof info_paciente.nacionalidad.name 'SIN DATOS' %}</td>
+            </table>
+        <table class="table table-bordered margin-tables-print">
+            </tr>
+                <th>PAÍS DE OCURRENCIA DEL CASO</th>
+                <td>{% firstof info_paciente.pais_ocurrencia.name 'SIN DATOS' %}</td>
+                <th>DEPARTAMENTO DE PROCEDENCIA/OCURRENCIA</th>
+                <td>{% firstof info_paciente.municipio_ocurrencia.departamento 'SIN DATOS' %}</td>
+                <th>MUNICIPIO DE PROCEDENCIA/OCURRENCIA</th>
+                <td>{% firstof info_paciente.municipio_ocurrencia 'SIN DATOS' %}</td>
+                <th>ÁREA DE OCURRENCIA DEL CASO</th>
+                <td>{% firstof info_paciente.get_area_ocurrencia_display 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            </tr>
+                <th>LOCALIDAD DE OCURRENCIA DEL CASO</th>
+                <td>{% firstof info_paciente.localidad_ocurrencia 'SIN DATOS' %}</td>
+                <th>BARRIO DE OCURRENCIA DEL CASO</th>
+                <td>{% firstof info_paciente.barrio_ocurrencia 'SIN DATOS' %}</td>
+                <th>CABECERA MUNICIPAL/CENTRO POBLADO/RURAL DISPERSO</th>
+                <td>{% firstof info_paciente.lugar_ocurrencia 'SIN DATOS' %}</td>
+                <th>VEREDA/ZONA</th>
+                <td>{% firstof info_paciente.vereda_zona 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            </tr>
+                <th>OCUPACIÓN DEL PACIENTE</th>
+                <td>{% firstof info_paciente.ocupacion 'SIN DATOS' %}</td>
+                <th>TIPO DE RÉGIMEN EN SALUD</th>
+                <td>{% firstof info_paciente.get_tipo_regimen_display 'SIN DATOS' %}</td>
+                <th>NOMBRE DE LA ADMINISTRADORA DE PLANES DE BENEFICIOS</th>
+                <td>{% firstof info_paciente.eapb 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            </tr>
+                <th>PERTENENCIA ÉTNICA</th>
+                <td>{% firstof info_paciente.get_pertenencia_etnica_display 'SIN DATOS' %}</td>
+                <th>GRUPO ÉTNICO</th>
+                <td>{% firstof info_paciente.grupo_etnico 'SIN DATOS' %}</td>
+                <th>ESTRATO</th>
+                <td>{% firstof info_paciente.get_estrato_display 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-tables-print">
+            </tr>
+                <th>GRUPOS POBLACIONALES</th>
+                <td>{% firstof info_paciente.get_grupos_poblacionales_display|join:' - ' 'SIN DATOS' %}</td>
+                <th>SEM. DE GESTACIÓN</th>
+                <td>{% firstof info_paciente.semanas_gestacion 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">NOTIFICACIÓN</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>FUENTE</th>
+                <td>{% firstof info_general.get_fuente_display 'SIN DATOS' %}</td>
+                <th>PAÍS DE RESIDENCIA</th>
+                <td>{% firstof info_general.pais_residencia.name 'SIN DATOS' %}</td>
+                <th>DEPARTAMENTO DE RESIDENCIA</th>
+                <td>{% firstof info_general.municipio_residencia.departamento 'SIN DATOS' %}</td>
+                <th>MUNICIPIO DE RESIDENCIA</th>
+                <td>{% firstof info_general.municipio_residencia 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>DIRECCIÓN DE RESIDENCIA</th>
+                <td>{% firstof info_general.direccion 'SIN DATOS' %}</td>
+                <th>FECHA DE CONSULTA</th>
+                <td>{% firstof info_general.fecha_consulta|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+                <th>FECHA DE INICIO DE SÍNTOMAS</th>
+                <td>{% firstof info_general.fecha_inicio_sintomas|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>CLASIFICACIÓN INICIAL DEL CASO</th>
+                <td>{% firstof info_general.get_clasificacion_inicial_caso_display 'SIN DATOS' %}</td>
+                <th>HOSPITALIZADO</th>
+                <td>{% firstof info_general.get_hospitalizado_display 'SIN DATOS' %}</td>
+                <th>FECHA DE HOSPITALIZACIÓN</th>
+                <td>{% firstof info_general.fecha_hospitalizacion|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>CONDICIÓN FINAL</th>
+                <td>{% firstof info_general.get_condicion_final_display 'SIN DATOS' %}</td>
+                <th>FECHA DE DEFUNCIÓN</th>
+                <td>{% firstof info_general.fecha_defuncion|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+                <th>NÚMERO DE CERIFICADO DE DEFUNCIÓN</th>
+                <td>{% firstof info_general.certificado_defuncion 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>CAUSA BÁSICA DE MUERTE</th>
+                <td>{% firstof info_general.causa_muerte 'SIN DATOS' %}</td>
+                <th>NOMBRE DEL PROFESIONAL QUE DILIGENCIÓ LA FICHA</th>
+                <td>{% firstof info_general.profesional_diligenciante 'SIN DATOS' %}</td>
+                <th>TELÉFONO</th>
+                <td>{% firstof info_general.telefono 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">ESPACIO EXCLUSIVO PARA USO DE LOS ENTES TERRITORIALES</h4>
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th>SEGUIMIENTO Y CLASIFICACIÓN FINAL DEL CASO</th>
+                <td>{% firstof info_general.get_clasificacion_final_caso_display 'SIN DATOS' %}</td>
+                <th>FECHA DE AJUSTE</th>
+                <td>{% firstof info_general.V|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+{% include ficha %}
+
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print text-uppercase">
+        <h4 class="header-print">DATOS DE LABORATORIO</h4>
+        <table class="table table-bordered margin-print">
+            {% for muestra in muestras %}
+            <tr>
+                <th>FECHA DE TOMA</th>
+                <td>{% firstof muestra.fecha_toma|date:"j \d\e F \d\e Y" 'SIN DATOS' %}</td>
+                <th>TIPO DE MUESTRA</th>
+                <td>{% firstof muestra.tipo_muestra 'SIN DATOS' %}</td>
+                <th>PRUEBA</th>
+                <td>{% firstof muestra.areas|join:" - " 'SIN DATOS' %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<br><br>
+<footer id="footer-ficha-covid">
+    <div class="row panel-footer">
+        <div class="text-center">
+            <img id="img-footer"src="{{ dominio }}{% static 'img/logo_gobernacion.png' %}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="row text-center">
+            <p class="base-text" id="usuario-imprime">Informe impreso el dia {{ fecha_impresion }} por el usuario: {{ user }}</p>
+        </div>
+    </div>
+</footer>
+{% endblock content %}
+

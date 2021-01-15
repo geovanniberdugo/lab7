@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block heading %}Temperatura{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/jquery.bootgrid.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-primary pull-right" href="{% url 'administracion:nuevo_temperatura' %}">Agregar Temperatura</a>
+    </div>
+    </div>
+    <br>
+
+    <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+        <tr>
+            <th data-column-id="id" data-identifier="true" data-visible="false"></th>
+            <th data-column-id="valor">Valor</th>
+            <th data-column-id="modificacion">Ultima modificación</th>
+            <th data-column-id="modificado">Modificado por</th>
+            <th data-column-id="commands" data-formatter="commands" data-sortable="false">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for temp in temperatura_list %}
+            <tr>
+            <td>{{ temp.id }}</td>
+            <td>{{ temp.valor|title }}</td>
+            <td>{{ temp.ultima_modificacion }}</td>
+            <td>{{ temp.modificado_por|title }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/jquery.bootgrid.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tables.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        tabla('{% url 'administracion:actualizar_temperatura' 0 %}');
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,205 @@
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">INFORMACIÓN SOLICITANTE</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="">
+            <table class="table table-bordered">
+                <tr>
+                    <th class="wd-15" lenght="11">INSTITUCIÓN SOLICITANTE</th>
+                    <td>{{ muestra.informacion_general.institucion.nombre|upper }}</td>
+                    <th class="wd-15" lenght="11">DIRECCIÓN SOLICITANTE</th>
+                    <td>{{ muestra.informacion_general.institucion.direccion|upper }}</td>
+                    <th class="wd-30">RESPONSABLE DE TOMA</th>
+                    <td>{{ muestra.informacion_general.responsable_entrega|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered">
+                <tr>
+                    <th class="wd-15">CARGO</th>
+                    <td>{{ muestra.informacion_general.cargo|upper }}</td>
+                    <th class="wd-15" lenght="11">NÚMERO DE CASO</th>
+                    <td>{{ muestra.informacion_general.numero_caso|upper }}</td>
+                    <th class="wd-30">NÚMERO DE OFICIO</th>
+                    <td>{{ muestra.informacion_general.numero_oficio|upper }}</td>
+                    <th class="wd-15">PROPIETARIO</th>
+                    <td>{{ muestra.informacion_general.propietario|upper }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">LUGAR DE RECOLECCIÓN</h4>
+            </div>
+        </div>
+        {% with info=muestra.informacion_general  %}
+        <table class="table table-bordered">
+            <tr>
+                <th>DEPARTAMENTO</th>
+                <td>{{ info.poblado.municipio.departamento|upper }}</td>
+                <th>MUNICIPIO</th>
+                <td>{{ info.poblado.municipio|upper }}</td>
+                <th>POBLADO</th>
+                <td>{{ info.poblado|upper }}</td>
+            </tr>
+            <tr>
+                <th>SITIO DE LA TOMA</th>
+                <td>{{ info.sitio_toma|upper }}</td>
+                <th>DIRECCION</th>
+                <td>{{ info.direccion|upper }}</td>
+                <th>FECHA</th>
+                <td>{{ info.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+            </tr>
+        </table>
+        {% endwith %}
+        <table class="table table-bordered margin-tables-print">
+            <tr>
+                <th class="wd-35">PROPÓSITO GÉNERAL DE LA PRUEBA</th>
+                <td>{{ informe.objeto|striptags|upper }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12 panel-print">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="header-print">DETALLE MUESTRA</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="">
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    <th>TEMPERATURA</th>
+                    <td>{{ muestra.temperatura|upper }}</td>
+                    <th>GRUPO DE BEBIDA ALCOHÓLICA</th>
+                    <td>{{ muestra.producto.grupo.nombre|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    <th>NOMBRE COMERCIAL</th>
+                    <td>{{ muestra.producto.nombre|upper }}</td>
+                    <th>REGISTRO SANITARIO</th>
+                    <td>{{ muestra.registro_sanitario|upper }}</td>
+                    <th>LOTE</th>
+                    <td>{{ muestra.numero_lote|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+
+                    <th>GRADO ALCOHOLIMÉTRICO</th>
+                    <td>{{ muestra.grado|upper }}</td>
+                    <th>FECHA VENCIMIENTO</th>
+                    <td>{% if not muestra.no_aplica_vencimiento %}{% if muestra.ano_vencimiento %}{{ muestra.ano_vencimiento }}{% endif %}{% if muestra.mes_vencimiento %}{% if muestra.ano_vencimiento %}/{% endif %}{{ muestra.mes_vencimiento }}{% endif %}{% if muestra.dia_vencimiento %}{% if muestra.ano_vencimiento or muestra.mes_vencimiento %}/{% endif %}{{ muestra.dia_vencimiento }}{% endif %}{% else %}NO
+                        APLICA VENCIMIENTO{% endif %}</td>
+                    <th>EMPRESA FABRICANTE</th>
+                    <td>{{ muestra.fabricante|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+
+                    <th>DIRECCIÓN FABRICANTE</th>
+                    <td>{{ muestra.direccion_fabricante|upper }}</td>
+                    <th>CONTENIDO DECLARADO</th>
+                    <td>{{ muestra.contenido|upper }}</td>
+                    <th>TIPO DE ENVASE</th>
+                    <td>{{ muestra.tipo_envase.nombre|upper }}</td>
+                </tr>
+            </table>
+            <table class="table table-bordered margin-tables-print">
+                <tr>
+                    <th>ASPECTO INTERNO</th>
+                    <td>{{ muestra.get_aspecto_interno_display|upper }}</td>
+                    <th>ASPECTO EXTERNO</th>
+                    <td>{{ muestra.get_aspecto_externo_display|upper }}</td>
+                    <th>HERMETICIDAD</th>
+                    <td>{{ muestra.get_hermeticidad_display|upper }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 panel-print">
+        <h4 class="header-print">EMISIÓN DE RESULTADOS</h4>
+    </div>
+</div>
+<div class="row radicado-muestra">
+    <div class="col-xs-12 margin-tables-print">
+        <table class="table table-bordered margin-print">
+            <tr>
+                <th colspan="4" class="text-center">
+                    <p class="base-text">{{ ingreso.radicado }}-{{ forloop.counter }}</p>
+                </th>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row table-responsive">
+    <div class="col-md-12">
+        <table class="table table-striped table-bordered">
+            {% regroup muestra.pruebasrealizadas_set.all by prueba.area as pruebas_agrupadas %}
+            {% for grupo in pruebas_agrupadas %}
+            <colgroup>
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+                <col width="25%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th colspan="{% if not forloop.first %}3{% else %}5{% endif %}">{{ grupo.grouper|upper }}</th>
+                    {% if not forloop.first %}<th colspan="2">NORMATIVIDAD: {{ muestra.decreto.nombre|upper }}</th>{% endif %}
+                </tr>
+                <tr>
+                    <th {% if grupo.list.0.prueba.area.oculto %}colspan="2"{% endif %}>PRUEBA</th>
+                    <th {% if grupo.list.0.prueba.area.oculto %}colspan="3"{% endif %}>RESULTADO</th>
+                    {% if not grupo.list.0.prueba.area.oculto %}
+                    <th>VALORES DE REFERENCIA</th>
+                    <th>MÉTODO UTILIZADO</th>
+                    <th>CONCEPTO ANALISTA</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for prueba_realizada in grupo.list %}
+                <tr>
+                    <td class="text-uppercase" {% if grupo.list.0.prueba.area.oculto %}colspan="2"{% endif %}>{{ prueba_realizada.prueba.nombre }}</td>
+                    <td class="text-uppercase" {% if grupo.list.0.prueba.area.oculto %}colspan="3"{% endif %}>
+                        {% if grupo.list.0.prueba.area.oculto %}
+                        {{ prueba_realizada.resultados.all|join:', ' }}
+                        {% else %}
+                        {{ prueba_realizada.resultado_numerico }}
+                        {% endif %}
+                    </td>
+                    {% if not grupo.list.0.prueba.area.oculto %}
+                    <td class="text-uppercase">{{ prueba_realizada.prueba.valores_referencia }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.metodo }}</td>
+                    <td class="text-uppercase">{{ prueba_realizada.concepto }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<table class="table table-bordered margin-tables-print">
+    <tr>
+        <th style="width: 40%;">TEMPERATURA DE PROCESAMIENTO DE LA MUESTRA</th>
+        <td>{{ muestra.temp_procesamiento }} ºC</td>
+    </tr>
+</table>

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block heading %}Áreas{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/jquery.bootgrid.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <br>
+
+    <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+        <tr>
+            <th data-column-id="id" data-identifier="true" data-visible="false"></th>
+            <th data-column-id="codigo">Nombre</th>
+            <th data-column-id="descripcion">Temperatura M&aacute;xima</th>
+            <th data-column-id="estado">Temperatura M&iacute;nima</th>
+            <th data-column-id="modificacion">Humedad M&aacute;xima</th>
+            <th data-column-id="modificado">Humedad M&iacute;nima</th>
+            <th data-column-id="commands" data-formatter="commands" data-sortable="false">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for area in area_list %}
+            <tr>
+            <td>{{ area.id }}</td>
+            <td>{{ area.nombre|title }}</td>
+            <td>{% if area.temperatura_maxima %}{{ area.temperatura_maxima }}{% else %}No Registrada{% endif %}</td>
+            <td>{% if area.temperatura_minima %}{{ area.temperatura_minima }}{% else %}No Registrada{% endif %}</td>
+            <td>{% if area.humedad_maxima %}{{ area.humedad_maxima }}{% else %}No Registrada{% endif %}</td>
+            <td>{% if area.humedad_minima %}{{ area.humedad_minima }}{% else %}No Registrada{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/jquery.bootgrid.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tables.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        tabla('{% url 'administracion:actualizar_area' 0 %}');
+    })
+</script>
+{% endblock %}

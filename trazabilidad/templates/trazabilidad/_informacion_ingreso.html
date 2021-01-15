@@ -1,0 +1,21 @@
+<div id="modal-info-{{ ingreso.id }}" class="modal fade" tabindex="-1" role="dialog">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header"><h3>{{ ingreso.programa|upper }}</h3></div>
+<div class="modal-body">
+
+    {% if template_detalle_programa %}
+        {% include template_detalle_programa with ingreso=ingreso muestra=ingreso.muestras.all.0 %}
+    {% endif %}
+
+    {% if ingreso.observaciones %}
+    <h4>Observaciones</h4>
+    <p>{{ingreso.observaciones|title}}</p>
+    {% endif %}
+</div>
+<div class="modal-footer">
+    <button data-dismiss="modal" id="cerrar_modal" class="btn btn-primary">Cerrar</button>
+</div>
+</div>
+</div>
+</div>

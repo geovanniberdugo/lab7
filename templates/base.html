@@ -1,0 +1,335 @@
+{% load utils %}
+{% load static waffle_tags %}
+
+<!DOCTYPE html>
+<html>
+<head lang="es">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>7Lab - {% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap-select.min.css' %}">
+	<!-- Estilos del Proyecto -->
+    <link href="{% static 'css/estilos.css' %}" rel="stylesheet">
+
+    {% block css %}{% endblock %}
+</head>
+<body>
+	<header>
+		<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+	    	<div class="container">
+	    		<div class="navbar-header">
+	    			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navegacion-fm">
+	    				<span class="sr-only">Desplegar / Ocultar Menú</span>
+	    				<span class="icon-bar"></span>
+	    				<span class="icon-bar"></span>
+	    				<span class="icon-bar"></span>	
+	    			</button>
+	    			<a href="#" class="navbar-brand">7Lab</a>
+	    		</div>
+
+    			<!-- Inicia el Menú -->
+                {% with es_superusuario=user|pertenece_grupo:"super usuario" recepcinista_clinico=user|pertenece_grupo:"recepcion muestras clinicas" recepcinista_ambiente=user|pertenece_grupo:"recepcion muestras de ambiente" administrador=user|pertenece_grupo:"administrador"  %}
+    			<div class="collapse navbar-collapse" id="navegacion-fm">
+    				<ul class="nav navbar-nav">
+    					<li class="active"><a href="{% url 'trazabilidad:home' %}">Inicio</a></li>
+                        {% if user.is_authenticated %}
+                            {% if perms.administracion.can_see_ingresos_recepcionados %}
+                            <li><a href="{% url 'trazabilidad:ingresos' %}">Solicitudes Recepcionadas</a></li>
+                            {% endif %}
+
+                            {% if es_superusuario or recepcinista_clinico or recepcionista_ambiente or perms.administracion.can_ingresar_muestras_programas_clinicos %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programas <span class="caret"></span></a>
+                                <ul class="dropdown-menu multi-level center-menu">
+                                    {% if perms.administracion.can_ingresar_muestras_programas_clinicos %}
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="#">Atención a las Personas</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="dropdown-submenu">
+                                                <a tabindex="-1" href="#">Clínico</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="{% url 'trazabilidad:nueva_muestra_clinica' %}">Clínico</a></li>
+                                                    <li role="separator" class="divider"></li>
+                                                    <li class="text-center"><h5>PROGRAMA COVID19</h5></li>
+                                                    <li><a href="{% url 'covid19:nueva_muestra_346' %}">Formulario 346</a></li>
+                                                    <li><a href="{% url 'covid19:nueva_muestra_348' %}">Formulario 348</a></li>
+                                                    {% if perms.administracion.can_consultar_resultados_covid %}
+                                                    <li><a href="{% url 'covid19:consulta_resultados' %}">Consulta de resultados</a></li>
+                                                    {% endif %}
+                                                    {% switch "consulta-resultados" %}
+                                                    {% if perms.administracion.can_mail_resultados_covid %}
+                                                    <li><a href="{% url 'covid19:envio_masivo_resultados_mail' %}">Envio masivo de resultados</a></li>
+                                                    {% endif %}
+                                                    {% if perms.administracion.can_exportar_ficha_excel %}
+                                                    <li><a href="{% url 'covid19:exportacion_excel_ficha' %}">Exportación a excel de fichas</a></li>
+                                                    {% endif %}
+                                                    {% endswitch %}
+                                                </ul>
+                                            </li>
+                                            <li><a href="{% url 'trazabilidad:nueva_muestra_citohistopatologia' %}">Citohistopatologia</a></li>
+                                            <li><a href="{% url 'trazabilidad:nueva_muestra_banco_sangre' %}">Banco de Sangre</a></li>
+                                            <li><a href="{% url 'trazabilidad:nueva_muestra_eedd' %}">Evaluación Externa de Desempeño Directo</a></li>
+                                            <li><a href="{% url 'trazabilidad:nueva_muestra_eeid' %}">Evaluación Externa de Desempeño Indirecto</a></li>
+                                        </ul>
+                                    </li>
+                                    {% endif %}
+                                    {% if perms.administracion.can_ingresar_muestras_programas_ambientes %}
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="#">Unidad de Vigilancia de Factores de Riesgo del Ambiente y del Consumo Humano</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="{% url 'trazabilidad:nueva_muestra_entomologia' %}">Entomologia</a></li>
+                                            <li><a href="{% url 'trazabilidad:nueva_muestra_agua' %}">Aguas</a></li>
+                                            <li><a href="{% url 'alimentos:nueva_muestra' %}">Alimentos</a></li>
+                                        <li><a href="{% url 'bebidas_alcoholicas:nueva_muestra' %}">Bebidas Alcohólicas</a></li>
+                                        </ul>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            {% endif %}
+                            {% if perms.administracion.can_see_analisis %}
+        					<li><a href="{% url 'trazabilidad:analisis' %}">Análisis</a></li>
+                            {% endif %}
+                            {% if perms.administracion.can_aprobar_informes %}
+        					<li><a href="{% url 'trazabilidad:aprobacion_informe' %}">Aprobación de informes</a></li>
+                            {% endif %}
+                            {% if es_superusuario or administrador or user|pertenece_grupo:"coordinador" or user|pertenece_grupo:"consultas generales" %}  
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Informes <span class="caret"></span></a>
+                            <ul class="dropdown-menu multi-level">
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Informes Gerenciales</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'trazabilidad:tipo_resultado' %}">Tipo de Resultado</a></li>
+                                        <li><a href="{% url 'trazabilidad:motivo_rechazo' %}">Motivo de Rechazo</a></li>
+                                        <li><a href="{% url 'trazabilidad:muestras_rechazadas' %}">Muestras Rechazadas</a></li>
+                                        <li><a href="{% url 'trazabilidad:cumplimiento_productividad' %}">Cumplimiento y Productividad</a></li>
+                                        <li><a href="{% url 'trazabilidad:solicitudes_recepcionadas' %}">Solicitudes Recepcionadas</a></li>
+                                        <li><a href="{% url 'trazabilidad:pendiente_aceptacion' %}">Solicitudes Pendientes Aceptación</a></li>
+                                        <li><a href="{% url 'trazabilidad:informes_resultados' %}">Informes de Resultados</a></li>
+                                        <li><a href="{% url 'trazabilidad:ingreso_parcial' %}">Ingreso Parcial</a></li>
+                                        <li><a href="{% url 'trazabilidad:productividad_recepcion' %}">Productividad recepción</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Informes Comparativos</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'trazabilidad:produccion_area' %}">Estadistico de Producción por Area</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a tabindex="-1" href="{% url 'trazabilidad:multiconsulta' %}">Multiconsultas Clinicos</a>
+                                </li>
+                            </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if perms.administracion.can_buscar_ingresos %}
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Buscar <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'trazabilidad:buscar_radicado' %}">Buscar Radicado</a></li>
+                            </ul>
+                            </li>
+                            {% endif %}                     
+
+                            {% if es_superusuario or user|pertenece_grupo:"analista" or user|pertenece_grupo:"biofisico" %}
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gestión de Documentos <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                {% comment %}<li><a href="{% url 'equipos:control_temperatura' %}">Control de Condiciones de Ambiente</a></li>{% endcomment %}
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Control de Condiciones de Ambiente</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'equipos:control_temperatura' %}">Control de Temperatura de Equipos</a></li>
+                                        <li><a href="{% url 'trazabilidad:control_temperatura_area' %}">Condiciones Medio Ambientales Área</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if es_superusuario or administrador %}
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administración <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <!--<li class="dropdown">-->
+                                    <!--<a tabindex="-1" href="{% url 'administracion:nuevo_usuario' %}">Crear Usuario</a>-->
+                                <!--</li>-->
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Usuarios</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_usuarios' %}">Lista Usuarios</a></li>
+                                        <li><a href="{% url 'administracion:lista_empleados' %}">Lista Empleados</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Géneral</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:config_general' %}">Configuración</a></li>
+                                        <li><a href="{% url 'administracion:lista_areas' %}">Áreas</a></li>
+                                        <li><a href="{% url 'administracion:lista_pruebas' %}">Pruebas</a></li>
+                                        <li><a href="{% url 'administracion:lista_metodos' %}">Método</a></li>
+                                        <li><a href="{% url 'administracion:lista_motivo_rechazos' %}">Motivo de Rechazo</a></li>
+                                        <li><a href="{% url 'administracion:lista_departamentos' %}">Departamento</a></li>
+                                        <li><a href="{% url 'administracion:lista_municipios' %}">Municipio</a></li>
+                                        <li><a href="{% url 'administracion:lista_poblados' %}">Poblado</a></li>
+                                        <li><a href="{% url 'administracion:lista_motivo_analisis' %}">Motivo Análisis</a></li>
+                                        <li><a href="{% url 'administracion:lista_pacientes' %}">Paciente</a></li>
+                                        <li><a href="{% url 'administracion:lista_objeto_pruebas' %}">Propósito Géneral Prueba</a></li>
+                                        <li><a href="{% url 'administracion:lista_resultado_pruebas' %}">Resultado de Pruebas</a></li>
+                                        <li><a href="{% url 'administracion:lista_tipo_muestras' %}">Tipos de Muestra</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Equipos</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_equipos' %}">Equipos</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Aguas</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_epsas' %}">EPSA</a></li>
+                                        <li><a href="{% url 'administracion:lista_categoria_aguas' %}">Categoria Agua</a></li>
+                                        <li><a href="{% url 'administracion:lista_tipo_aguas' %}">Tipo Agua</a></li>
+                                        <li><a href="{% url 'administracion:lista_temperaturas' %}">Temperatura</a></li>
+                                        <li><a href="{% url 'administracion:lista_solicitantes' %}">Solicitante</a></li>
+                                        <li><a href="{% url 'administracion:lista_descripcion_puntos' %}">Descripción Punto</a></li>
+                                        <li><a href="{% url 'administracion:lista_fuente_abastecimientos' %}">Fuente Abastecimiento</a></li>
+                                        <li><a href="{% url 'administracion:lista_lugar_puntos' %}">Lugar Punto</a></li>
+                                        <li><a href="{% url 'administracion:lista_codigo_puntos' %}">Código Punto</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Alimentos</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_solicitante_alimentos' %}">Solicitante</a></li>
+                                        <li><a href="{% url 'administracion:lista_grupos' %}">Grupo</a></li>
+                                        <li><a href="{% url 'administracion:lista_categorias' %}">Tipo</a></li>
+                                        <li><a href="{% url 'administracion:lista_sub_categorias' %}">Sub-Categoria</a></li>
+                                        <li><a href="{% url 'administracion:lista_fabricantes' %}">Fabricante</a></li>
+                                        <li><a href="{% url 'administracion:lista_distribuidors' %}">Distribuidor</a></li>
+                                        <li><a href="{% url 'administracion:lista_normatividads' %}">Normatividad</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Bebidas Alcohólicas</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_grupo_bebida_alcoholicas' %}">Grupo</a></li>
+                                        <li><a href="{% url 'administracion:lista_productos' %}">Producto</a></li>
+                                        <li><a href="{% url 'administracion:lista_decretos' %}">Normatividad</a></li>
+                                        <li><a href="{% url 'administracion:lista_tipo_envase_bebida_alcoholicas' %}">Tipo de Envase</a></li>
+                                    </ul>
+                                </li>
+                            
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Citohistopatología</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_institucion_citohistopatologias' %}">Institución Citohistopatología</a></li>
+                                        <li><a href="{% url 'administracion:lista_controls' %}">Control</a></li>
+                                        <li><a href="{% url 'administracion:lista_tipo_eventos' %}">Tipo Evento</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Clinico</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_epss' %}">EPS</a></li>
+                                        <li><a href="{% url 'administracion:lista_institucions' %}">Institución</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Covid19</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_upgd' %}">UPGD</a></li>
+                                        <li><a href="{% url 'administracion:lista_eapb' %}">EAPB</a></li>
+                                        <li><a href="{% url 'administracion:lista_tipificacion' %}">Tipificación</a></li>
+                                        <li><a href="{% url 'administracion:lista_ocupacion' %}">Ocupación</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Entomología</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_responsable_recoleccions' %}">Responsable Recolección</a></li>
+                                        <li><a href="{% url 'administracion:lista_lugar_recoleccions' %}">Lugar Recolección</a></li>
+                                        <li><a href="{% url 'administracion:lista_tipo_vigilancias' %}">Tipo Vigilancia</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Banco Sangre</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_tipo_envases' %}">Tipo Envase</a></li>
+                                        <li><a href="{% url 'administracion:lista_institucion_banco_sangres' %}">Institución Banco Sangre</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">EEID</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_programa_evaluacion_externas' %}">Programa Evaluación Externa</a></li>
+                                        <li><a href="{% url 'administracion:lista_institucion_eeids' %}">Institución EEID</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">EEDD</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'administracion:lista_tipo_evento_evaluacion_externas' %}">Tipo Evento Evaluación Externa</a></li>
+                                        <li><a href="{% url 'administracion:lista_institucion_eedds' %}">Institución EEDD</a></li>
+                                    </ul>
+                                </li>
+
+                            </ul>
+                            </li>
+                            {% endif %}
+                            <li><a href="{% url 'logout' %}">Salir</a></li>
+                         {% endif %}
+    				</ul>
+    			</div>
+                {% endwith %}
+	    	</div>					
+		</nav>
+	</header>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>{% block heading %}{% endblock %}</h2>
+        </div>
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="text-center hidden-print">
+        7Lab pertenece a 7Consultores. Licenciado a Salud Pública del departamento del Atlántico <br>
+        Fecha de terminación de la licencia: 30 Noviembre 2020
+    </footer>
+
+    <!-- Core Scripts - Include with every page -->
+    <script src="{% static 'js/jquery-1.11.3.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-select.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('select:not(#id_general-causa_muerte)').select2({ theme: 'bootstrap' });
+        });
+    </script> 
+    {% block js %}{% endblock %}
+</body>
+</html>

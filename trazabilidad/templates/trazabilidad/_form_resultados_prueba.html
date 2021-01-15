@@ -1,0 +1,62 @@
+{% load crispy_forms_tags %}
+
+<form id="form-{{ prueba.id }}" action="{% url 'trazabilidad:actualizar_estado' prueba.id %}#anchor-{{ ingreso.radicado }}" method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-6 form-group {% if prueba_actualizada %}{{ form_resultado_actual.resultados.css_classes }}{{ form_resultado_actual.resultado_numerico.css_classes }}{% endif %}">
+            {% if ingreso.usa_resultado_numerico and not prueba.prueba.area.oculto %}
+                {% if prueba_actualizada %}
+                    {{ form_resultado_actual.resultado_numerico|as_crispy_field }}
+                {% else %}
+                    <label class="control-label" for="id_resultado">Resultado*</label>
+                    <input class="form-control" id="id_resultado_numerico" type="text" name="resultado_numerico" step="0.01">
+                {% endif %}
+            {% else %}
+                {% if prueba_actualizada %}
+                    {{ form_resultado_actual.resultados|as_crispy_field }}
+                {% else %}
+                    <label class="control-label" for="id_resultado">Resultado*</label>
+                    <select multiple class="form-control" name="resultados" id="id_resultados">
+                        <option value="">----------</option>
+                        {% for resultado in prueba.prueba.resultados.all %}
+                        <option value="{{ resultado.id }}">{{ resultado }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="col-md-6 form-group {% if prueba_actualizada %}{{ form_resultado_actual.metodo.css_classes }}{% endif %}">
+            {% if prueba_actualizada%}
+                sad
+                {{ form_resultado_actual.errors }}
+                {{ form_resultado_actual.metodo|as_crispy_field }}
+            {% else %}
+                <label class="control-label" for="id_metodo">Metodo utilizado*</label>
+                <select class="form-control" name="metodo" id="id_metodo">
+                    <option value="">----------</option>
+                    {% for metodo in prueba.prueba.metodos.all %}
+                    <option value="{{ metodo.id }}">{{ metodo }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if ingreso.has_concepto and not prueba.prueba.area.oculto %}
+    <div class="row">
+        <div class="col-md-6 form-group {% if prueba_actualizada %}{{ form_resultado_actual.concepto.css_classes }}{% endif %}">
+            {% if prueba_actualizada %}
+                {{ form_resultado_actual.concepto|as_crispy_field }}
+            {% else %}
+                <label class="control-label" for="id_concepto">Concepto</label>
+                <input class="form-control" id="id_concepto" type="text" name="concepto">
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if prueba.color_semaforo == 'rojo' %}
+        {{ form_observacion|crispy }}
+    {% endif %}
+</form>

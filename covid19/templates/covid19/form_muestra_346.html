@@ -1,0 +1,107 @@
+{% extends 'covid19/form_muestra_covid.html' %}
+{% load crispy_forms_tags static %}
+
+{% block tipo_muestra_heading %}
+Infección Respiratoria Aguda por virus nuevo. Cod INS 346
+{% endblock tipo_muestra_heading %}
+
+{% block datos_especificos %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-plus-square"></i> ¿Por qué se notifica como el caso de IRA por virus nuevo?
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-8">{{ form_info.trabajador_salud|as_crispy_field }}</div>
+            <div class="col-md-4">{{ form_info.viajo_area_con_virus|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">{{ form_info.viaje_nacional|as_crispy_field }}</div>
+            <div class="col-md-4">{{ form_info.departamento_viaje_nacional|as_crispy_field }}</div>
+            <div class="col-md-4">{{ form_info.municipio_viaje_nacional|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">{{ form_info.viaje_internacional|as_crispy_field }}</div>
+            <div class="col-md-5">{{ form_info.pais_viaje_iternacional|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">{{ form_info.contacto_caso_confirmado|as_crispy_field }}</div>
+            <div class="col-md-4 inline-checks">{{ form_info.sintomas|as_crispy_field }}</div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-medkit"></i> Antecedentes Vacunales
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">{{ form_info.influenza_estacional|as_crispy_field }}</div>
+            <div class="col-md-6">{{ form_info.dosis_influenza_estacional|as_crispy_field }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-user-md"></i> Antecedentes Clínicos
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12 inline-checks">{{ form_info.antecedentes_clinicos|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ form_info.otros_antecedentes_clinicos|as_crispy_field }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <i class="fa fa-hospital-o"></i> Diagnóstico y Tratamiento
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">{{ form_info.radiografia_torax|as_crispy_field }}</div>
+            <div class="col-md-6">{{ form_info.antibiotico_ultimas_semanas|as_crispy_field }}</div>
+        </div>
+    </div>
+</div>
+{% endblock  %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $("#id_general-viajo_area_con_virus").on('change', function ({ target }) {
+            const selects = [
+                'id_general-viaje_nacional',
+                'id_general-departamento_viaje_nacional',
+                'id_general-municipio_viaje_nacional',
+                'id_general-viaje_internacional',
+                'id_general-pais_viaje_iternacional',
+            ]
+
+            if (target.value === 'NO') {
+                disableSelects(selects);
+            } else {
+                enableFields(selects);
+            }
+        });
+
+        $("#id_general-influenza_estacional").on('change', function ({ target }) {
+            const inputs = ['id_general-dosis_influenza_estacional'];
+
+            if (target.value !== 'SI') {
+                disableSelects(inputs);
+            } else {
+                enableFields(inputs);
+            }
+        });
+    </script>
+{% endblock  %}

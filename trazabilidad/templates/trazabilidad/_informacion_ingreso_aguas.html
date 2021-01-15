@@ -1,0 +1,128 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+{% with info=muestra.informacion_general  %}
+
+<h4>Origen de la Muestra</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Departamento</th>
+        <td>{{ info.poblado.municipio.departamento|upper }}</td>
+    </tr>
+    <tr>
+        <th>Municipio</th>
+        <td>{{ info.poblado.municipio|upper }}</td>
+    </tr>
+    <tr>
+        <th>Poblado</th>
+        <td>{{ info.poblado|upper }}</td>
+    </tr>
+    <tr>
+        <th>Epsa</th>
+        <td>{{ info.poblado.epsa.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Dirección</th>
+        <td>{{ info.poblado.epsa.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Nit</th>
+        <td>{{ info.poblado.epsa.nit|upper }}</td>
+    </tr>
+</table>
+
+
+<h4>Datos de la Muestra</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Fecha de recolección</th>
+        <td>{{ info.fecha_recoleccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Responsable de toma</th>
+        <td>{{ info.responsable_toma|upper }}</td>
+    </tr>
+    <tr>
+        <th>Solicitante</th>
+        <td>{{ info.solicitante.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Tipo de agua</th>
+        <td>{{ info.tipo_agua.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Temperatura</th>
+        <td>{{ info.temperatura.valor|upper }}</td>
+    </tr>
+    <!--<tr>
+        <th>Pruebas Solicitadas</th>
+        <td>
+            {% for prueba in muestra.areas %}
+                {{ prueba.nombre|upper }}
+                {% if not forloop.last %}
+                    -
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>-->
+</table>
+
+<h4>Detalles de las Muestras</h4>
+{% for muestra_ in ingreso.muestras.all %}
+<h5>Muestra #{{ forloop.counter }}</h5>
+<table class="table table-bordered">
+    <tr>
+        <th>Hora de la Toma</th>
+        <td>{{ muestra_.hora_toma }}</td>
+    </tr>
+    <tr>
+        <th>Código del Punto</th>
+        <td>{{ muestra_.codigo_punto.codigo }}</td>
+    </tr>
+    <tr>
+        <th>Direccion</th>
+        <td>{{ muestra_.codigo_punto.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Lugar Punto de Toma</th>
+        <td>{{ muestra_.codigo_punto.lugar_toma.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Fuente de Abastecimiento</th>
+        <td>{{ muestra_.codigo_punto.fuente_abastecimiento.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Punto Intradomiciliario</th>
+        <td>{{ muestra_.codigo_punto.get_punto_intradomiciliario_display }}</td>
+    </tr>
+    <tr>
+        <th>Concertado</th>
+        <td>{{ muestra_.concertado|yesno:"SI,NO" }}</td>
+    </tr>
+    <tr>
+        <th>Motivo Análisis</th>
+        <td>{{ muestra_.motivo_analisis.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Pruebas Solicitadas</th>
+        <td>
+            {% for prueba in muestra.areas %}
+                {{ prueba.nombre|upper }}
+                {% if not forloop.last %}
+                    -
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+{% endfor %}
+
+{% endwith %}

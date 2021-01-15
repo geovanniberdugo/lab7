@@ -1,0 +1,39 @@
+<h4>IDENTIFICACIÓN DEL PACIENTE</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>NOMBRES</th>
+        <td>{{ paciente.paciente.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>APELLIDOS</th>
+        <td>{{ paciente.paciente.apellido|upper }}</td>
+    </tr>
+    <tr>
+        <th>DOCUMENTO ID</th>
+        <td>{{ paciente.paciente.get_tipo_identificacion_display|upper }} {{ paciente.paciente.identificacion }}</td>
+    </tr>
+    <tr>
+        <th>EDAD</th>
+        <td>{{ paciente.paciente.edad }} {{ paciente.paciente.get_tipo_edad_display|upper }}</td>
+    </tr>
+    <tr>
+        <th>DIRECCION</th>
+        <td>{{ paciente.paciente.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>EPS-PLAN</th>
+        <td>{{ paciente.paciente.eps.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>SEXO</th>
+        <td>{{ paciente.paciente.get_sexo_display|upper }}</td>
+    </tr>
+    {% if not bancodesangre and not citohistopatologia %}
+    {% if paciente.paciente.get_sexo_display == 'Femenino' %}
+    <tr>
+        <th>EMBARAZADA</th>
+        <td>{% if paciente.embarazada == False %}NO{% else %}SI{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% endif %}
+</table>

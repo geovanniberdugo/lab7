@@ -1,0 +1,45 @@
+{% extends 'trazabilidad/estado_muestra_base.html' %}
+
+{% block informacion_muestra %}
+    {% include 'trazabilidad/_estado_datos_paciente.html' with paciente=muestra citohistopatologia=True %}
+
+    <h4>LUGAR DE RECOLECCIÓN</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>DEPARTAMENTO</th>
+            <td>{{ muestra.institucion.municipio.departamento|upper }}</td>
+        </tr>
+        <tr>
+            <th>MUNICIPIO</th>
+            <td>{{ muestra.institucion.municipio|upper }}</td>
+        </tr>
+        <tr>
+            <th>NOMBRE</th>
+            <td>{{ muestra.institucion.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>CODIGO</th>
+            <td>{{ muestra.institucion.codigo }}</td>
+        </tr>
+    </table>
+
+    <h4>DATOS DE LA MUESTRA</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>CONTROL</th>
+            <td>{{ muestra.control.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>TIPO DE EVENTO</th>
+            <td>{{ muestra.tipo_evento.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>TIPO DE MUESTRA</th>
+            <td>{{ muestra.tipo_muestra.nombre|upper }}</td>
+        </tr>
+    </table>
+{% endblock informacion_muestra %}
+
+{% block form_action %}{% url 'trazabilidad:estado_muestra_citohistopatologia' ingreso.id %}{% endblock %}
+
+{% block edit_url %}{% url 'trazabilidad:actualizar_muestra_citohistopatologia' ingreso.id %}{% endblock %}

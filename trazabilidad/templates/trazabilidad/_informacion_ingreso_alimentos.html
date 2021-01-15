@@ -1,0 +1,168 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+{% with info=muestra.informacion_general  %}
+
+<h4>Entidad Solicitante</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Solicitante</th>
+        <td>{{ info.solicitante.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Dirección</th>
+        <td>{{ info.direccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Responsable del Muestreo</th>
+        <td>{{ info.responsable|upper }}</td>
+    </tr>
+    <tr>
+        <th>Cargo</th>
+        <td>{{ info.cargo|upper }}</td>
+    </tr>
+</table>
+
+<h4>Lugar de Recolección</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Departamento</th>
+        <td>{{ info.poblado.municipio.departamento|upper }}</td>
+    </tr>
+    <tr>
+        <th>Municipio</th>
+        <td>{{ info.poblado.municipio|upper }}</td>
+    </tr>
+    <tr>
+        <th>Poblado</th>
+        <td>{{ info.poblado|upper }}</td>
+    </tr>
+    <tr>
+        <th>Punto de Toma</th>
+        <td>{{ info.sitio_toma|upper }}</td>
+    </tr>
+    <tr>
+        <th>Dirección</th>
+        <td>{{ info.direccion_recoleccion|upper }}</td>
+    </tr>
+    <tr>
+        <th>Fecha</th>
+        <td>{{ info.fecha|date:"j \d\e F \d\e Y \a \l\a\s h:i A"|upper }}</td>
+    </tr>
+</table>
+
+
+<h4>Información de la Muestra</h4>
+{% for muestra_ in ingreso.muestras.all %}
+    <table class="table table-bordered">
+        <h5>Muestra #{{forloop.counter}}</h5>
+        <tr>
+            <th>No. Unidad Muestra</th>
+            <td>{{ muestra_.unidad_muestra|upper }}</td>
+        </tr>
+        <tr>
+            <th>Contenido Neto Por Unidad</th>
+            <td>{{ muestra_.contenido_neto|upper }}</td>
+        </tr>
+        <tr>
+            <th>No. Unidad de Contramuestra</th>
+            <td>{{ muestra_.unidad_contramuestra|upper }}</td>
+        </tr>
+        <tr>
+            <th>Grupo de Alimento</th>
+            <td>{{ muestra_.tipo.grupo.descripcion|upper }}</td>
+        </tr>
+        <tr>
+            <th>Tipo de Alimento</th>
+            <td>{{ muestra_.tipo.descripcion|upper }}</td>
+        </tr>
+        <tr>
+            <th>Sub-Categoria</th>
+            <td>{{ muestra_.subcategoria.descripcion|upper }}</td>
+        </tr>
+        <tr>
+            <th>Descripción del Producto según el rótulo</th>
+            <td>{{ muestra_.descripcion|upper }}</td>
+        </tr>
+        <tr>
+            <th>Registro Sanitario</th>
+            <td>{{ muestra_.registro_sanitario|upper }}</td>
+        </tr>
+        <tr>
+            <th>Lote</th>
+            <td>{{ muestra_.lote|upper }}</td>
+        </tr>
+        <tr>
+            <th>Propietario</th>
+            <td>{{ muestra_.propietario|upper }}</td>
+        </tr>
+        <tr>
+            <th>Importador</th>
+            <td>{{ muestra_.importador|upper }}</td>
+        </tr>
+        <tr>
+            <th>Dirección Importador</th>
+            <td>{{ muestra_.direccion_importador|upper }}</td>
+        </tr>
+        {% if muestra_.ano_vencimiento %}
+        <tr>
+            <th>Año Vencimiento</th>
+            <td>{{ muestra_.ano_vencimiento|upper }}</td>
+        </tr>
+            {% if muestra_.mes_vencimiento %}
+            <tr>
+                <th>Mes Vencimiento</th>
+                <td>{{ muestra_.mes_vencimiento|upper }}</td>
+            </tr>
+            {% endif %}
+            {% if muestra_.dia_vencimiento %}
+            <tr>
+                <th>Dia Vencimiento</th>
+                <td>{{ muestra_.dia_vencimiento|upper }}</td>
+            </tr>
+            {% endif %}
+        {% else %}
+        <tr>
+            <th>Fecha Vencimiento</th>
+            <td>NO APLICA</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th>Responsable Entrega</th>
+            <td>{{ muestra_.responsable_entrega|upper }}</td>
+        </tr>
+        <tr>
+            <th>Fabricante</th>
+            <td>{{ muestra_.fabricante.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>Distribuidor</th>
+            <td>{{ muestra_.distribuidor.nombre|upper }}</td>
+        </tr>
+        <tr>
+            <th>Normatividades</th>
+            <td>{% for decreto in muestra_.decretos.all %}{% if forloop.first %}{{ decreto|upper }}{% else %}, {{ decreto|upper }}{% endif %}{% empty %}NO DEFINIDAS AÚN{% endfor %}</td>
+        </tr>
+        <tr>
+            <th>Pruebas Solicitadas</th>
+            <td>
+                {% for prueba in muestra_.areas %}
+                    {{ prueba.nombre|upper }}
+                    {% if not forloop.last %}
+                        -
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+{% endfor %}
+
+{% endwith %}

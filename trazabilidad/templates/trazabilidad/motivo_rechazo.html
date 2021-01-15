@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block heading %}
+    INFORMES GERENCIALES: MOTIVO DE RECHAZO
+{% endblock %}
+
+{% block content %}
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en Formularios de Fecha!</strong> {{ form.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_programa.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores en los Formularios de Programa y Prueba!</strong> {{ form_programa.errors }}
+        </div>
+    {% endif %}
+
+    <form action="." method="POST">
+    {% csrf_token %}
+        <div class="row hidden-print">
+            <div class="col-xs-2">
+                <p class="hidden-print {{ form.fechai.css_classes }}"><label for="id_fechai">Fecha Inicial:</label> {{form.fechai}}</p> 
+            </div>  
+            <div class="col-xs-2">
+                <p class="hidden-print {{ form.fechaf.css_classes }}"><label for="id_fechaf">Fecha Final:</label> {{form.fechaf}}</p> 
+            </div>
+            <div class="col-xs-4">
+                <p class="hidden-print {{ form_programa.programa.css_classes }}"><label for="id_programa">Programa:</label> {{form_programa.programa}}</p> 
+            </div>
+            <div class="col-xs-4">
+                <p class="hidden-print {{ form_programa.prueba.css_classes }}"><label for="id_prueba">Prueba:</label> {{form_programa.prueba}}</p> 
+            </div>                                 
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-xs-2">
+                <button type="submit" class="btn btn-primary btn-block hidden-print">Buscar</button>
+            </div>
+            <div class="col-xs-2 col-xs-offset-8">
+                {% if imprimir %}
+                    <button type="button" class="btn btn-default btn-sm hidden-print" id="imprimir">
+                        <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+                    </button>
+                    <div class="hidden-print"><br></div>
+                {% endif %}
+            </div>            
+        </div>    
+    </form> 
+    <br>
+    <div class="row">
+        <div class="col-xs-6">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                      <th></th>  
+                      <th>Motivo Rechazo</th>
+                      <th>Frecuencia</th>
+                      <th>Porcentaje</th>
+                      <th>% Acumulado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in lista %}
+                        <tr class="parent">
+                            <td class="text-center open"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></td>
+                            <td>{{p.resultado|capfirst}}</td>
+                            <td>{{p.frecuencia}}</td>
+                            <td>{{p.porcentaje|floatformat}}</td>
+                            <td>{{p.acumulado|floatformat}}</td>
+                        </tr>
+                        <tr class="child hidden">
+                            <td colspan="5">
+                                <table class="table">
+                                    <tr>
+                                        <th>Radicado</th>
+                                        <th>Recepción</th>
+                                        <th>Resultados</th>
+                                        <th>{{ x.solicitante }}</th>
+                                    </tr>
+                                    {% for x in p.detalle %}
+                                        <tr>
+                                            <td>{{ x.registro_recepcion.radicado }}</td>
+                                            <td>{{ x.fecha_recepcion|date:"Y/m/d"}} {{ x.fecha_recepcion|time:"H:i" }}</td>
+                                            <td>"Ninguno"</td>
+                                            <td>{{ x.solicitante }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </td>
+                        </tr>            
+                    {% endfor %}
+                    {% if lista %}
+                        <tr>
+                            <td></td>
+                            <th>Total</th>
+                            <td>{{total}}</td>
+                            <td>100</td>
+                            <td>--</td>
+                        </tr>
+                    {% endif %}                     
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xs-6">
+            <div id="piechart_3d" style="width: 800px; height: 400px;"></div>
+        </div>                
+    </div>             
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="/static/js/funciones_apoyo.js"></script>
+    <script src="/static/js/moment.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript">
+        {% if sw %}
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable({{ grafico|safe }});
+
+                var options = {
+                    title: 'Tipo de Resultado',
+                    is3D: true,
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+                chart.draw(data, options);
+            }
+        {% endif %}
+    $(document).ready(function(){
+        $('#id_fechai,#id_fechaf').datetimepicker({
+            format:'YYYY-MM-DD'
+        });
+
+        $('.parent .open').click(function(){
+            var extra = $(this).parent().next('.child');
+            if (extra.hasClass('hidden')) {
+                extra.removeClass('hidden');
+            }
+            else {
+                extra.addClass('hidden');
+            }
+        });
+
+        $('#imprimir').click(function(){
+            window.print();
+            document.location.href = "{% url 'trazabilidad:tipo_resultado' %}";
+        });
+
+        $('#id_programa').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                llenar_select('#id_prueba', []);
+            }
+            else {
+                $.getJSON("{% url 'trazabilidad:programas_pruebas' 0 %}".replace(0, id), function(response){
+                    console.log(response);
+                    llenar_select('#id_prueba', response);
+                });
+            }
+        });
+    });    
+    </script>
+{% endblock %}

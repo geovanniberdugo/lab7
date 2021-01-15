@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div id="login">
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="form-group">
+        	<div class="row">
+        		<div class="col-md-4"></div>
+                <div class="col-md-4">{{ form|crispy }}</div>
+                <div class="col-md-4"></div>
+            </div>
+            <div class="row">
+            	<div class="col-md-4"></div>
+            	<div class="col-md-4">
+            		<button type="submit" class="btn btn-primary">Ingresar</button>
+            	</div>
+            	<div class="col-md-4"></div>
+            </div>
+            <br>
+            <div class="row">
+            <p class="text-center text-uppercase col-md-4 col-md-offset-4">
+                <b>licenciado para el laboratorio de salud publica por 7 consultores plus</b>
+            </p>
+            </div>
+    	</div>
+    </form>
+    </div>
+{% endblock content %}

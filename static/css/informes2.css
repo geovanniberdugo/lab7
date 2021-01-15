@@ -1,0 +1,199 @@
+@page:first {
+    size: letter portrait;
+    margin-top: -65px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+@page {
+    size: letter portrait;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+@media print {
+    table {
+        font-size:12.2px;
+        margin-bottom: 5px;
+    }
+
+    th, td {
+        padding: 2px !important;
+    }
+
+    .text-center {
+        font-size:10px;
+    }
+
+    h3 {
+       font-size:18px;
+    }
+
+    h4 {
+       font-size:15px;
+    }
+
+    h2, h3 {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    /*img {*/
+        /*height: 50px;*/
+        /*width:40px;*/
+    /*}*/
+
+    .page {
+        margin-top: 5px;
+        margin-right: 0px;
+        margin-bottom: 5px;
+    }
+
+    .toprint {
+        height: 25px !important;
+        font-size: 10px !important;
+        margin-top: -10px;
+    }
+
+    .toprint .row div p {
+        font-size: 15px !important;
+        height: 20px !important;
+    }
+
+    .toprint .row div p.text-center {
+        margin-top: 40px;
+        margin-bottom: 30px;
+    }
+
+    .text-title-print {
+        font-size: 14px;
+        margin-top: -15px !important;
+    }
+
+    .radicado-print {
+        font-size: 14px;
+        margin-top: -14px;
+    }
+
+    .header-print {
+        font-size: 14px;
+    }
+
+    .header-info-print {
+        font-size: 10px;
+    }
+
+    .panel-print {
+        margin-top: -25px !important;
+        /*margin-bottpx;*/
+    }
+
+    h4.title-print {
+        font-size: 14px;
+    }
+
+    .usuario-print {
+        font-size: 10px;
+    }
+
+    .p-print {
+        font-size: 8px;
+        margin-bottom: 0px;
+    }
+
+    .p-print-radicado {
+      margin-bottom: 0px;
+      font-size: 10px;
+    }
+
+    .end-print {
+        /*page-break-after: always !important;*/
+        margin-top: 6px;
+        margin-right: 30px;
+        /*position: fixed;
+        bottom: 0;*/
+    }
+
+    .td-percent {
+        width: 15% !important;
+    }
+
+    .img-header {
+        width: 65px !important;
+        height: 65px !important;
+    }
+
+    .img-footer {
+        width: 100px !important;
+        height: 100px !important;
+        margin-top: 30px !important;
+    }
+
+    .panel-footer {
+        margin-top: 60px;
+    }
+
+    .panel-print-down {
+        margin-bottom: -21px;
+    }
+
+    small {
+        font-size: 14px;
+    }
+
+    .wd-4 {
+        width: 4%;
+    }
+
+    .wd-6 {
+        width: 6%;
+    }
+
+    .wd-8 {
+        width: 8%;
+    }
+
+    .wd-10 {
+        width: 10%;
+    }
+
+    .wd-11 {
+        width: 11%;
+    }
+
+    .wd-12 {
+        width: 12%;
+    }
+
+    .wd-13 {
+        width: 13%;
+    }
+
+    .wd-15 {
+        width: 15%;
+    }
+
+    .wd-30 {
+        width: 30%;
+    }
+
+    #footer {
+        /*page-break-after: always !important;*/
+        margin-top: 8px;
+        margin-right: 30px;
+        position: fixed;
+        bottom: 0;
+    }
+
+    #end {
+        page-break-after: always;
+    }
+}
+
+
+#img-footer {
+    width: 300px;
+}

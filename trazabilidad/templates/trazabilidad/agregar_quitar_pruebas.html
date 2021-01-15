@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block heading %}
+    Agregar/Quitar Pruebas
+{% endblock heading %}
+
+{% block content %}
+{% for muestra in ingreso.muestras.all %}
+<div class="row">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center text-uppercase">
+            <h5>{{ ingreso.radicado }}{% if ingreso.programa.nombre == 'aguas' or ingreso.programa.nombre == 'alimentos' or ingreso.programa.codigo == 'bebidas_alcoholicas' %}-{{ forloop.counter }}{% endif %}</h5>
+        </div>
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Pruebas Solicitadas</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <form action="" method="post" class="eliminar-form"> <!--id="eliminar-form"-->
+                            {% csrf_token %}
+                                {% for prueba in muestra.pruebasrealizadas_set.all %}
+                                    {% if not prueba.prueba.area.oculto %}
+                                    <tr>
+                                        <td>{{ prueba.prueba }}</td>
+                                        <td>
+                                        {% if prueba.estado == prueba.CONSERVACION and muestra.pruebasrealizadas_set.all|length > 1 %}
+                                            <button name="eliminar_prueba" value="{{ prueba.id }}" class="btn btn-primary btn-xs" title="Eliminar"><i class="glyphicon glyphicon-minus"></i></button>
+                                        {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </form>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row row_submit">
+                <form action="" method="POST">
+                {% csrf_token %}
+                    <div class="col-md-12">
+                        <input type="hidden" name="muestra" value="{{ muestra.id }}">
+                        <div id="div_prueba" class="{{ form.pruebas.css_classes }}">
+                            <label class="control-label" for="id_pruebas">Pruebas:</label>
+                            {% if ingreso.programa.codigo == 'alimentos' %}
+                                {% for decreto in muestra.decretos.all %}
+                                    {% for prueba in decreto.pruebas.all %}
+                                        {% if prueba not in muestra.pruebas.all %}
+                                            <div class="checkbox">
+                                                <label for="id_pruebas_{{ prueba.id }}">
+                                                    <input type="checkbox" id="id_pruebas_{{ prueba.id }}" name="pruebas" value="{{ prueba.id }}">
+                                                    {{ prueba }}
+                                                </label>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% elif ingreso.programa.codigo == 'bebidas_alcoholicas' %}
+                                {% for prueba in muestra.decreto.pruebas.all %}
+                                    {% if prueba not in muestra.pruebas.all %}
+                                        <div class="checkbox">
+                                            <label for="id_pruebas_{{ prueba.id }}">
+                                                <input type="checkbox" id="id_pruebas_{{ prueba.id }}" name="pruebas" value="{{ prueba.id }}">
+                                                {{ prueba }}
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% for area in muestra.areas %}
+                                    {% for p in area.pruebas.all %}
+                                        {% if p not in muestra.pruebas.all %}
+                                        <div class="checkbox">
+                                            <label for="id_pruebas_{{p.id}}">
+                                                <input type="checkbox" id="id_pruebas_{{p.id}}" name="pruebas" value="{{ p.id }}">
+                                                {{ p }}
+                                            </label>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-10 col-md-offset-2 to_append">
+                        {% comment %}<button class="btn btn-primary" type="submit" name="agregar">Agregar Pruebas</button>{% endcomment %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock content %}
+
+{% block js %}
+<script>
+$(document).ready(function () {
+    $('.row_submit').each(function() {
+        if ($(this).find('input[name="pruebas"]')[0]) {
+            $(this).find('.to_append').html('<button class="btn btn-primary" type="submit" name="agregar">Agregar Pruebas</button>');
+        } else {
+            $(this).find('.to_append').html('No hay pruebas para agregar');
+        }
+    });
+})
+</script>
+{% endblock %}

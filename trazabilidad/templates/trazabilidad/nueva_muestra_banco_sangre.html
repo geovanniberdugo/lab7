@@ -1,0 +1,157 @@
+{% extends 'trazabilidad/nueva_muestra_base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block tipo_muestra_heading %}De Banco de Sangre{% endblock %}
+
+{% block form_errors %}
+    {% if form_responsable.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Responsable de Recolección!</strong> {{ form_responsable.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_paciente.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Datos del Paciente!</strong> {{ form_paciente.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_institucion.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Lugar de Recolección!</strong> {{ form_institucion.errors }}
+        </div>
+    {% endif %}
+
+    {% if form_muestra.errors %}
+        <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Corregir los siguientes errores Formulario Muestra de Banco de Sangre!</strong> {{ form_muestra.errors }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_action %}
+    {% if muestra_nueva %}
+        {% url 'trazabilidad:nueva_muestra_banco_sangre' %}
+    {% else %}
+        {% url 'trazabilidad:actualizar_muestra_banco_sangre' form_ingreso.instance.pk %}
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo_form %}
+    {% include "trazabilidad/_form_paciente.html" %}
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Lugar de Recolección
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="{{ form_institucion.institucion.css_classes }}">
+                        <label class="control-label" for="id_institucion">Institución:</label>
+                        {{ form_institucion.institucion }}
+                    </p>
+                </div>
+            </div>
+
+            <div id="institucion_nueva" {% if form_institucion.instance.pk %}class="hidden"{% endif %} >
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="{{ form_institucion.departamento.css_classes }}">
+                            <label class="control-label" for="id_departamento">Departamento:</label>
+                            {{ form_institucion.departamento }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p class="{{ form_institucion.municipio.css_classes }}">
+                            <label class="control-label" for="id_municipio">Municipio:</label>
+                            {{ form_institucion.municipio }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="{{ form_institucion.nombre.css_classes }}">
+                            <label class="control-label" for="id_nombre">Nombre:</label>
+                            {{ form_institucion.nombre }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <i class="fa fa-user"></i> Muestra de Banco de Sangre
+        </div>
+        <!-- /.panel-heading -->
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_muestra.tipo_envase|as_crispy_field }}
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_muestra.tipo_muestra|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_muestra.temp_ingreso|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_muestra.formatos_diligenciados|as_crispy_field }}
+                </div>
+
+                <div class="col-md-2">
+                    {{ form_muestra.ficha_pacientes|as_crispy_field }}
+                </div>
+
+                <div class="col-md-2">
+                    {{ form_muestra.condensado_banco|as_crispy_field }}
+                </div>
+            </div>
+
+            {% block form_pruebas %}
+                {{ block.super }}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="{% static 'js/get_paciente_info.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+
+        get_paciente_info("{% url 'trazabilidad:detalle_paciente_json' 0 %}");
+
+        $('#id_institucion-institucion').change(function(){
+            var id = $(this).val();
+            if(id=="") {
+                $('#institucion_nueva').removeClass('hidden');
+                $('#id_institucion-nombre').val('');
+            }
+            else {
+                $('#institucion_nueva').addClass('hidden');
+            }
+        });
+
+        //Llenando el municipio según el departamento
+        llenar_select_hijo_segun_padre("{% url 'trazabilidad:lista_municipos_departamento_json' 0 %}", '#id_institucion-departamento', '#id_institucion-municipio');
+    });
+    </script>
+{% endblock %}

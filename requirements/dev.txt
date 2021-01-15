@@ -1,0 +1,8 @@
+-r base.txt
+
+django-extensions
+django-debug-toolbar
+django-silk
+
+pytest
+pytest-django

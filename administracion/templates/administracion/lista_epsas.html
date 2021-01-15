@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block heading %}EPSA{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/jquery.bootgrid.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-primary pull-right" href="{% url 'administracion:nuevo_epsa' %}">Agregar EPSA</a>
+    </div>
+    </div>
+    <br>
+
+    <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+        <thead>
+        <tr>
+            <th data-column-id="id" data-identifier="true" data-visible="false"></th>
+            <th data-column-id="nombre">Nombre</th>
+            <th data-column-id="direccion">Dirección</th>
+            <th data-column-id="rup">Rup</th>
+            <th data-column-id="nit">Nit</th>
+            <th data-column-id="tipo">Tipo</th>
+            <th data-column-id="modificacion">Ultima modificación</th>
+            <th data-column-id="modificado">Modificado por</th>
+            <th data-column-id="commands" data-formatter="commands" data-sortable="false">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for eps in epsa_list %}
+            <tr>
+            <td>{{ eps.id }}</td>
+            <td>{{ eps.nombre|title }}</td>
+            <td>{{ eps.direccion|title }}</td>
+            <td>{{ eps.rup }}</td>
+            <td>{{ eps.nit }}</td>
+            <td>{{ eps.tipo }}</td>
+            <td>{{ eps.ultima_modificacion }}</td>
+            <td>{{ eps.modificado_por|title }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/jquery.bootgrid.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tables.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        tabla('{% url 'administracion:actualizar_epsa' 0 %}');
+    })
+</script>
+{% endblock %}

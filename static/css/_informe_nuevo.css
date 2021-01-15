@@ -1,0 +1,157 @@
+@page:first {
+    size: letter portrait;
+    margin-top: -65px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+@page {
+    size: letter portrait;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+@media print {
+    /* td para una imagen */
+    .base-text {
+        font-size: 6px;
+    }
+
+    .header-print {
+        font-size: 10px;  /* Titulo sin etiqueta */
+    }
+
+    .radicado-print {
+        font-size: 10px;
+        margin-top: -14px !important;
+    }
+
+    #footer {
+        /*page-break-after: always !important;*/
+        margin-top: 8px;
+        margin-right: 30px;
+        position: fixed;
+        bottom: 0;
+    }
+
+    .panel-footer {
+        margin-top: 40px;
+    }
+
+    .img-footer {
+        width: 100px !important;
+        height: 100px !important;
+        margin-top: 30px !important;
+    }
+
+    .img-header {
+        width: 65px !important;
+        height: 65px !important;
+    }
+
+    .toprint {
+        height: 25px !important;
+        font-size: 6px !important;
+        margin-top: -10px;
+    }
+
+    table {
+        font-size:8.2px;
+        margin-bottom: 5px;
+    }
+
+    .page {
+        margin-top: 5px;
+        margin-right: 0px;
+        margin-bottom: 5px;
+    }
+
+    .panel-print {
+        margin-top: -25px !important;
+        /*margin-bottpx;*/
+    }
+
+    .margin-print {
+        margin-top: -5px;
+    }
+
+    .margin-tables-print {
+        margin-top: -21px;
+    }
+
+    .margin-tables-print-plus {
+        margin-top: -22px;
+    }
+
+    h2, h3 {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .td-percent {
+        width: 15% !important;
+    }
+
+    .wd-4 {
+        width: 4%;
+    }
+
+    .wd-6 {
+        width: 6%;
+    }
+
+    .wd-8 {
+        width: 8%;
+    }
+
+    .wd-10 {
+        width: 10%;
+    }
+
+    .wd-11 {
+        width: 11%;
+    }
+
+    .wd-12 {
+        width: 12%;
+    }
+
+    .wd-13 {
+        width: 13%;
+    }
+
+    .wd-15 {
+        width: 15%;
+    }
+
+    .wd-30 {
+        width: 30%;
+    }
+
+    .wd-35 {
+        width: 35%;
+    }
+
+    #end {
+        page-break-after: always;
+    }
+}
+
+#img-footer {
+    width: 300px;
+}
+
+.margin-print {
+    margin-top: -5px;
+}
+
+.margin-tables-print {
+    margin-top: -21px;
+}
+
+.margin-tables-print-plus {
+    margin-top: -22px;
+}

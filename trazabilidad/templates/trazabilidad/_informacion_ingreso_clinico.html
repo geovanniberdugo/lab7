@@ -1,0 +1,53 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+{% include 'trazabilidad/_estado_datos_paciente.html' with paciente=muestra %}
+{% include 'trazabilidad/_estado_procedencia_ocurrencia.html' with procedencia=muestra %}
+
+<h4>Lugar de Recolección</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Institución</th>
+        <td>{{ muestra.institucion.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Departamento</th>
+        <td>{{ muestra.institucion.municipio.departamento|upper }}</td>
+    </tr>
+    <tr>
+        <th>Municipio</th>
+        <td>{{ muestra.institucion.municipio|upper }}</td>
+    </tr>
+</table>
+
+
+<h4>Información de la Muestra</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Tipo de muestra</th>
+        <td>{% for tipo_muestra in muestra.tipo_muestras.all %}{% if forloop.first %}{{ tipo_muestra.nombre|upper }}{% else %}, {{tipo_muestra.nombre|upper }}{% endif %}{% endfor %}</td>
+    </tr>
+    <tr>
+        <th>Area</th>
+        <td>{{ ingreso.areas.first|upper }}</td>
+    </tr>
+    <tr>
+        <th>Pruebas Solicitadas</th>
+        <td>
+            {% for prueba in muestra.pruebas.all.distinct %}
+                {{ prueba.nombre|upper }}
+                {% if not forloop.last %}
+                    -
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+</table>

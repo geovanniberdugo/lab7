@@ -1,0 +1,66 @@
+<table class="table table-bordered">
+    <tr>
+        <th>No. Radicado</th>
+        <td>{{ ingreso.radicado }}</td>
+    </tr>
+    <tr>
+        <th>Fecha de recepción</th>
+        <td>{{ ingreso.fecha_recepcion }}</td>
+    </tr>
+</table>
+
+<h4>Responsable de Recolección</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Nombres</th>
+        <td>{{ muestra.responsable_recoleccion.nombres|upper }}</td>
+    </tr>
+    <tr>
+        <th>Apellidos</th>
+        <td>{{ muestra.responsable_recoleccion.apellidos|upper }}</td>
+    </tr>
+</table>
+
+<h4>Lugar de Recolección</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Nombre</th>
+        <td>{{ muestra.lugar_recoleccion.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Departamento</th>
+        <td>{{ muestra.lugar_recoleccion.municipio.departamento|upper }}</td>
+    </tr>
+    <tr>
+        <th>Municipio</th>
+        <td>{{ muestra.lugar_recoleccion.municipio|upper }}</td>
+    </tr>
+</table>
+
+
+<h4>Información de la Muestra</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Tipo de vigilancia</th>
+        <td>{{ muestra.tipo_vigilancia.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Estado de desarrollo</th>
+        <td>{{ muestra.get_estado_desarrollo_display|upper }}</td>
+    </tr>
+    <tr>
+        <th>Tipo de muestra</th>
+        <td>{{ muestra.tipo_muestra.nombre|upper }}</td>
+    </tr>
+    <tr>
+        <th>Pruebas Solicitadas</th>
+        <td>
+            {% for prueba in muestra.pruebas.all.distinct %}
+                {{ prueba.nombre|upper }}
+                {% if not forloop.last %}
+                    -
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+</table>
